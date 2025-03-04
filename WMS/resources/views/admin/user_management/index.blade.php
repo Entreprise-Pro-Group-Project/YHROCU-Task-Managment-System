@@ -29,14 +29,14 @@
                         <!-- Sidebar -->
                         <div class="w-1/4 pr-4">
                             <div class="space-y-2">
-                                <button type="button" onclick="toggleModal('addUserModal')" class="bg-gray-900 text-white w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900">
+                                <button type="button" onclick="toggleModal('addUserModal')" style="background-color: #FFD100;" class="text-black w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
                                         <path d="M16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                                     </svg>
                                     Add User
                                 </button>
-                                <button type="button" onclick="toggleModal('resetPasswordModal')" class="bg-white text-gray-700 border border-gray-300 w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                <button type="button" class="bg-white text-gray-700 border border-gray-300 w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
                                     </svg>
@@ -82,7 +82,7 @@
                                                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                                                             </svg>
                                                         </button>
-                                                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline">
+                                                        <form action="{{ route('admin.user_management.users.destroy', $user->id) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="text-black hover:text-gray-700" onclick="return confirm('Are you sure you want to delete this user?')">
@@ -115,7 +115,7 @@
             <div class="mt-3 text-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Add New User</h3>
                 <div class="mt-2 px-7 py-3">
-                    <form action="{{ route('users.store') }}" method="POST">
+                    <form action="{{ route('admin.user_management.users.store') }}" method="POST">
                         @csrf
                         <div class="mb-4">
                             <label for="first_name" class="block text-gray-700 text-sm font-bold mb-2 text-left">First Name</label>
@@ -157,47 +157,8 @@
                             <button type="button" onclick="toggleModal('addUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Cancel
                             </button>
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            <button type="submit" style="background-color: #FFD100;" class="text-black font-bold py-2 px-4 rounded hover:bg-yellow-400 focus:outline-none focus:shadow-outline">
                                 Add User
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Reset Password Modal -->
-    <div id="resetPasswordModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3 text-center">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Reset Password</h3>
-                <div class="mt-2 px-7 py-3">
-                    <form id="resetPasswordForm" action="" method="POST">
-                        @csrf
-                        <div class="mb-4">
-                            <label for="user_id" class="block text-gray-700 text-sm font-bold mb-2 text-left">Select User</label>
-                            <select name="user_id" id="user_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                                <option value="">Select a user</option>
-                                @foreach ($users as $user)
-                                    <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }} ({{ $user->email }})</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-4">
-                            <label for="reset_password" class="block text-gray-700 text-sm font-bold mb-2 text-left">New Password</label>
-                            <input type="password" name="password" id="reset_password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        </div>
-                        <div class="mb-4">
-                            <label for="reset_password_confirmation" class="block text-gray-700 text-sm font-bold mb-2 text-left">Confirm New Password</label>
-                            <input type="password" name="password_confirmation" id="reset_password_confirmation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                        </div>
-                        <div class="flex items-center justify-between mt-4">
-                            <button type="button" onclick="toggleModal('resetPasswordModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                Cancel
-                            </button>
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                Reset Password
                             </button>
                         </div>
                     </form>
@@ -218,9 +179,58 @@
 
         function viewUser(userId) {
             // Fetch user data with AJAX
-            fetch(`/users/${userId}`)
+            fetch(`/admin/user-management/users/${userId}`)
                 .then(response => response.json())
                 .then(user => {
+                    // Create modal dynamically if it doesn't exist
+                    if (!document.getElementById('viewUserModal')) {
+                        const modalHtml = `
+                            <div id="viewUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                                    <div class="mt-3 text-center">
+                                        <h3 class="text-lg leading-6 font-medium text-gray-900">User Details</h3>
+                                        <div class="mt-2 px-7 py-3 text-left">
+                                            <div class="mb-4">
+                                                <p class="text-sm font-bold text-gray-700">First Name:</p>
+                                                <p id="view_first_name" class="text-gray-600"></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <p class="text-sm font-bold text-gray-700">Last Name:</p>
+                                                <p id="view_last_name" class="text-gray-600"></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <p class="text-sm font-bold text-gray-700">Username:</p>
+                                                <p id="view_username" class="text-gray-600"></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <p class="text-sm font-bold text-gray-700">Email:</p>
+                                                <p id="view_email" class="text-gray-600"></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <p class="text-sm font-bold text-gray-700">Phone Number:</p>
+                                                <p id="view_phone_number" class="text-gray-600"></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <p class="text-sm font-bold text-gray-700">Role:</p>
+                                                <p id="view_role" class="text-gray-600"></p>
+                                            </div>
+                                            <div class="mb-4">
+                                                <p class="text-sm font-bold text-gray-700">Created At:</p>
+                                                <p id="view_created_at" class="text-gray-600"></p>
+                                            </div>
+                                            <div class="flex items-center justify-center mt-4">
+                                                <button type="button" onclick="toggleModal('viewUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                                    Close
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', modalHtml);
+                    }
+                    
                     // Fill the view modal with user details
                     document.getElementById('view_first_name').textContent = user.first_name;
                     document.getElementById('view_last_name').textContent = user.last_name;
@@ -241,10 +251,10 @@
 
         function editUser(userId) {
             // Fetch user data with AJAX
-            fetch(`/users/${userId}`)
+            fetch(`/admin/user-management/users/${userId}`)
                 .then(response => response.json())
                 .then(user => {
-                    // Create modal dynamically
+                    // Create modal dynamically if it doesn't exist
                     if (!document.getElementById('editUserModal')) {
                         const modalHtml = `
                             <div id="editUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
@@ -287,7 +297,7 @@
                                                     <button type="button" onclick="toggleModal('editUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                                         Cancel
                                                     </button>
-                                                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                                    <button type="submit" style="background-color: #FFD100;" class="text-black font-bold py-2 px-4 rounded hover:bg-yellow-400 focus:outline-none focus:shadow-outline">
                                                         Save Changes
                                                     </button>
                                                 </div>
@@ -301,7 +311,7 @@
                     }
 
                     // Set the form action
-                    document.getElementById('editUserForm').action = `/users/${userId}`;
+                    document.getElementById('editUserForm').action = `/admin/user-management/users/${userId}`;
                     
                     // Fill the form with user data
                     document.getElementById('edit_first_name').value = user.first_name;
@@ -316,60 +326,8 @@
                 })
                 .catch(error => {
                     console.error('Error fetching user data:', error);
-                    alert('Failed to load user data. Please try again.');
+                    alert('Failed to load user details. Please try again.');
                 });
         }
-
-        // Initialize reset password form
-        document.getElementById('user_id').addEventListener('change', function() {
-            const userId = this.value;
-            if (userId) {
-                document.getElementById('resetPasswordForm').action = `/users/${userId}/reset-password`;
-            }
-        });
     </script>
-
-    <!-- View User Modal -->
-    <div id="viewUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div class="mt-3">
-                <h3 class="text-lg leading-6 font-medium text-gray-900 text-center mb-4">User Details</h3>
-                <div class="px-4 py-3">
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-500">First Name</p>
-                        <p id="view_first_name" class="text-lg text-gray-900 font-medium"></p>
-                    </div>
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-500">Last Name</p>
-                        <p id="view_last_name" class="text-lg text-gray-900 font-medium"></p>
-                    </div>
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-500">Username</p>
-                        <p id="view_username" class="text-lg text-gray-900 font-medium"></p>
-                    </div>
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-500">Email</p>
-                        <p id="view_email" class="text-lg text-gray-900 font-medium"></p>
-                    </div>
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-500">Phone Number</p>
-                        <p id="view_phone_number" class="text-lg text-gray-900 font-medium"></p>
-                    </div>
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-500">Role</p>
-                        <p id="view_role" class="text-lg text-gray-900 font-medium"></p>
-                    </div>
-                    <div class="mb-3">
-                        <p class="text-sm text-gray-500">Created At</p>
-                        <p id="view_created_at" class="text-lg text-gray-900 font-medium"></p>
-                    </div>
-                    <div class="flex items-center justify-center mt-6">
-                        <button type="button" onclick="toggleModal('viewUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                            Close
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </x-app-layout> 

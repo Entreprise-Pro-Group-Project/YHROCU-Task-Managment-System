@@ -23,13 +23,13 @@ class Task extends Model
     }
 
     // Relationship to parent task
-    public function parentTask()
+    public function parent()
     {
         return $this->belongsTo(Task::class, 'parent_id');
     }
 
     // Relationship to sub-tasks
-    public function subTasks()
+    public function subtasks()
     {
         return $this->hasMany(Task::class, 'parent_id');
     }

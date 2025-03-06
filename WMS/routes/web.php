@@ -72,8 +72,9 @@ Route::post('/reset-password', [PasswordResetLinkController::class, 'update'])
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
 });
+
 
 /*
 // Admin User Management Routes
@@ -84,3 +85,15 @@ Route::prefix('admin/user_management')->name('admin.user_management.')->group(fu
     Route::put('/users/{user}', [App\Http\Controllers\UserController::class, 'update'])->name('admin.user_management.update');
     Route::delete('/users/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('admin.user_management.destroy');
 }); */
+
+Route::get('/profile/edit', function () {
+    return view('profile.partials.edit');
+});
+
+Route::get('/user-profile', function () {
+    return view('users.userprofile');
+});
+
+
+require __DIR__.'/auth.php';
+

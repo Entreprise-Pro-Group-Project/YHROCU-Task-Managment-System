@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.sapp')
 
 @section('content')
     <div class="min-h-screen">
@@ -53,7 +53,7 @@
                 </div>
                 
                 <div class="container mx-auto p-4">
-                    <h2 class="text-2xl font-bold mb-4">Dashboard</h2>
+                    <h2 class="text-2xl font-bold mb-4">Supervisor Dashboard</h2>
 
                     <!-- Display Projects -->
                     @foreach ($projects as $project)
@@ -134,8 +134,6 @@
                 e.stopPropagation(); 
                 // Close filter dropdown if open
                 filterDropdown.classList.add('hidden');
-                // Toggle admin dropdown
-                adminDropdown.classList.toggle('hidden');
             });
 
             // Filter dropdown

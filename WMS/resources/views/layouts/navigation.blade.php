@@ -9,18 +9,15 @@
         Welcome, <span class="font-bold">{{ Auth::user()->first_name }}</span>
     </div>
 
-    <!-- Right Column: User Role Button with Dropdown -->
+    <!-- Right Column: Role Button with Dropdown -->
     <div class="flex-1 flex justify-end">
         <div class="relative inline-block">
             <!-- Role Button -->
             <button
-                id="adminButton"
+                id="roleButton"
                 class="bg-[#0284c7] text-white px-3 py-1 rounded inline-flex items-center space-x-1 hover:bg-[#0273a3]"
             >
-                <!-- Display the user's role instead of "Admin" -->
-                <span>
-                    {{ Auth::check() ? Auth::user()->role : 'Guest' }}
-                </span>
+                <span>{{ ucfirst(Auth::user()->role) }}</span> <!-- Dynamically display role -->
                 <!-- Dropdown Arrow -->
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -29,7 +26,7 @@
 
             <!-- Dropdown Menu (hidden by default) -->
             <div
-                id="adminDropdown"
+                id="roleDropdown"
                 class="hidden absolute top-full right-0 mt-1 w-40 bg-white text-[#0284c7] rounded shadow-lg z-10"
             >
                 <a href="{{ route('profile.edit') }}" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
@@ -48,21 +45,20 @@
     </div>
 </nav>
 
-
-<!-- JavaScript for Admin Dropdown -->
+<!-- JavaScript for Role Dropdown -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const adminButton = document.getElementById('adminButton');
-        const adminDropdown = document.getElementById('adminDropdown');
+        const roleButton = document.getElementById('roleButton');
+        const roleDropdown = document.getElementById('roleDropdown');
 
-        adminButton.addEventListener('click', function (e) {
+        roleButton.addEventListener('click', function (e) {
             e.stopPropagation();
-            adminDropdown.classList.toggle('hidden');
+            roleDropdown.classList.toggle('hidden');
         });
 
         // Hide dropdown when clicking outside
         document.addEventListener('click', function () {
-            adminDropdown.classList.add('hidden');
+            roleDropdown.classList.add('hidden');
         });
     });
 </script>

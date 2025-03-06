@@ -58,47 +58,21 @@
                     <!-- Display Projects -->
                     @foreach ($projects as $project)
                     <div class="mb-6 p-4 border rounded">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold">{{ $project->project_name }}</h3>
-                    <div class="flex space-x-2">
-                        <!-- View Project Button -->
-                        <a href="{{ route('projects.show', $project->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                            View
-                        </a>
-                        <!-- Edit Project Button -->
-                        <a href="{{ route('projects.edit', $project->id) }}" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-                            Edit
-                        </a>
-                        <!-- Delete Project Button -->
-                        <form action="{{ route('projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this project?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                                Delete
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                <p><strong>Start Date:</strong> {{ $project->project_date }}</p>
-                <p><strong>Due Date:</strong> {{ $project->due_date }}</p>
-                <p><strong>Supervisor:</strong> {{ $project->supervisor_name }}</p>
-
-                <!-- Display Tasks -->
-                @foreach ($project->tasks as $task)
-                    <div class="ml-4 mt-2 p-2 border rounded">
                         <div class="flex justify-between items-center">
-                            <p><strong>Task:</strong> {{ $task->task_name }}</p>
+                            <h3 class="text-xl font-bold">{{ $project->project_name }}</h3>
                             <div class="flex space-x-2">
-                                <!-- View Task Button -->
-                                <a href="{{ route('tasks.show', $task->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                <!-- View Project Button -->
+                                <a href="{{ route('projects.show', $project->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
                                     View
                                 </a>
-                                <!-- Edit Task Button -->
-                                <a href="{{ route('tasks.edit', $task->id) }}" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                                
+                                <!-- Edit Project Button -->
+                                <a href="{{ route('projects.edit', $project->id) }}" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
                                     Edit
                                 </a>
-                                <!-- Delete Task Button -->
-                                <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this task?');">
+                                
+                                <!-- Delete Project Button -->
+                                <form action="{{ route('projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this project?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
@@ -107,11 +81,39 @@
                                 </form>
                             </div>
                         </div>
-                        <p><strong>Assigned Staff:</strong> {{ $task->assigned_staff }}</p>
-                        <p><strong>Due Date:</strong> {{ $task->due_date }}</p>
-
-                        <!-- Display Subtasks -->
-                        @foreach ($task->subtasks as $subtask)
+                        <p><strong>Start Date:</strong> {{ $project->project_date }}</p>
+                        <p><strong>Due Date:</strong> {{ $project->due_date }}</p>
+                        <p><strong>Supervisor:</strong> {{ $project->supervisor_name }}</p>
+                        
+                        <!-- Display Tasks -->
+                        @foreach ($project->tasks as $task)
+                        <div class="ml-4 mt-2 p-2 border rounded">
+                            <div class="flex justify-between items-center">
+                                <p><strong>Task:</strong> {{ $task->task_name }}</p>
+                                <div class="flex space-x-2">
+                                    <!-- View Task Button -->
+                                    <a href="{{ route('tasks.show', $task->id) }}" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                        View
+                                    </a>
+                                    <!-- Edit Task Button -->
+                                    <a href="{{ route('tasks.edit', $task->id) }}" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                                        Edit
+                                    </a>
+                                    <!-- Delete Task Button -->
+                                    <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this task?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <p><strong>Assigned Staff:</strong> {{ $task->assigned_staff }}</p>
+                            <p><strong>Due Date:</strong> {{ $task->due_date }}</p>
+                            
+                            <!-- Display Subtasks -->
+                            @foreach ($task->subtasks as $subtask)
                             <div class="ml-4 mt-2 p-2 border rounded">
                                 <div class="flex justify-between items-center">
                                     <p><strong>Subtask:</strong> {{ $subtask->task_name }}</p>
@@ -155,7 +157,6 @@
                 e.stopPropagation(); 
                 // Close filter dropdown if open
                 filterDropdown.classList.add('hidden');
-                // Toggle admin dropdown
             });
 
             // Filter dropdown

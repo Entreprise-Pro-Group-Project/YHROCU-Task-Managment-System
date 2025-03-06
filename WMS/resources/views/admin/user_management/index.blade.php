@@ -82,7 +82,7 @@
                                                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                                                             </svg>
                                                         </button>
-                                                        <form action="{{ route('admin.user_management.users.destroy', $user->id) }}" method="POST" class="inline">
+                                                        <form action="{{ route('admin.user_management.destroy', $user->id) }}" method="POST" class="inline">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="text-black hover:text-gray-700" onclick="return confirm('Are you sure you want to delete this user?')">
@@ -115,7 +115,7 @@
             <div class="mt-3 text-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Add New User</h3>
                 <div class="mt-2 px-7 py-3">
-                    <form action="{{ route('admin.user_management.users.store') }}" method="POST">
+                    <form action="{{ route('admin.user_management.store') }}" method="POST">
                         @csrf
                         <div class="mb-4">
                             <label for="first_name" class="block text-gray-700 text-sm font-bold mb-2 text-left">First Name</label>

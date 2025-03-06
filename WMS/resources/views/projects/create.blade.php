@@ -54,4 +54,40 @@
             </button>
         </form>
     </div>
+
+    
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Admin dropdown
+    const adminButton = document.getElementById('adminButton');
+    const adminDropdown = document.getElementById('adminDropdown');
+    
+    // Filter dropdown
+    const filterButton = document.getElementById('filterButton');
+    const filterDropdown = document.getElementById('filterDropdown');
+
+    adminButton.addEventListener('click', function (e) {
+        e.stopPropagation(); 
+        // Close filter dropdown if open
+        filterDropdown.classList.add('hidden');
+        // Toggle admin dropdown visibility
+        adminDropdown.classList.toggle('hidden');
+    });
+
+    filterButton.addEventListener('click', function (e) {
+        e.stopPropagation();
+        // Close admin dropdown if open
+        adminDropdown.classList.add('hidden');
+        // Toggle filter dropdown visibility
+        filterDropdown.classList.toggle('hidden');
+    });
+
+    // Hide both dropdowns when clicking anywhere else
+    document.addEventListener('click', function () {
+        adminDropdown.classList.add('hidden');
+        filterDropdown.classList.add('hidden');
+    });
+});
+</script>
 @endsection
+

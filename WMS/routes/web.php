@@ -8,6 +8,8 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\SupervisorController;
+use App\Http\Controllers\StaffController;
+
 
 
 Route::get('/', function () {
@@ -55,6 +57,11 @@ Route::get('tasks/{task}', [SupervisorController::class, 'showTask'])->name('tas
 Route::get('tasks/{task}/edit', [SupervisorController::class, 'editTask'])->name('tasks.edit');
 Route::put('tasks/{task}', [SupervisorController::class, 'updateTask'])->name('tasks.update');
 
+//Route for Staff tasks
+
+Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
+
+
 //User Management routes
 Route::get('/users', [App\Http\Controllers\UserController::class, 'indexView'])->name('admin.user_management.index');
 Route::post('/users', [App\Http\Controllers\UserController::class, 'store'])->name('admin.user_management.store');
@@ -67,10 +74,7 @@ Route::get('/supervisor/dashboard', function () {
     return view('supervisor.dashboard');
 })->name('supervisor.dashboard');
 
-// Staff dashboard
-Route::get('/staff/dashboard', function () {
-    return view('staff.dashboard');
-})->name('staff.dashboard');
+
 
 
 Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])

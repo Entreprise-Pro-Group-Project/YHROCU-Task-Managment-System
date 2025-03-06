@@ -47,7 +47,7 @@ class TaskController extends Controller
         return view('tasks.create');
     }
 
-    // Store a new task
+    // Store a new task in the database
     public function store(Request $request)
     {
         $request->validate([
@@ -57,18 +57,17 @@ class TaskController extends Controller
             'parent_id' => 'nullable|exists:tasks,id',
         ]);
 
-        // Store the task in the session
-        $task = [
-            'id' => uniqid(), // Temporary ID for session
-            'task_name' => $request->task_name,
+        // Create the task using Eloquent. 
+        // Ensure that the 'assigned_staff' field stores the staff user's first name (or desired string).
+        Task::create([
+            'task_name'      => $request->task_name,
+            'project_id'     => $request->project_id ?? null,
             'assigned_staff' => $request->assigned_staff,
-            'due_date' => $request->due_date,
-            'parent_id' => $request->parent_id,
-        ];
-
-        $tasks = session('tasks', []);
-        $tasks[] = $task;
-        session(['tasks' => $tasks]);
+            'due_date'       => $request->due_date,
+            'parent_id'      => $request->parent_id,
+            'status'         => $request->status ?? null,
+            'comment'        => $request->comment ?? null,
+        ]);
 
         return redirect()->route('projects.create')->with('success', 'Task added successfully');
     }

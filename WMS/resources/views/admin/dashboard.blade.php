@@ -156,7 +156,6 @@
                 // Close filter dropdown if open
                 filterDropdown.classList.add('hidden');
                 // Toggle admin dropdown
-                adminDropdown.classList.toggle('hidden');
             });
 
             // Filter dropdown

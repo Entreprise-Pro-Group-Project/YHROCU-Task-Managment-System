@@ -35,9 +35,10 @@
                             id="filterDropdown"
                             class="hidden absolute top-full left-0 mt-1 w-32 bg-white rounded-md shadow-lg z-20 text-sm"
                         >
-                            <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">Incomplete</a>
+                            <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">Assigned</a>
                             <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">In Progress</a>
                             <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">Completed</a>
+                            <a href="#" class="block px-3 py-2 text-gray-700 hover:bg-gray-100">Over Due</a>
                         </div>
                     </div>
 
@@ -74,6 +75,7 @@
                             <p><strong>Start Date:</strong> {{ $project->project_date }}</p>
                             <p><strong>Due Date:</strong> {{ $project->due_date }}</p>
                             <p><strong>Supervisor:</strong> {{ $project->supervisor_name }}</p>
+                            <p><strong>Progress:</strong> {{ $project->progress }} %</p>
 
                             <!-- Display Tasks -->
                             @foreach ($project->tasks as $task)
@@ -93,6 +95,7 @@
                                     </div>
                                     <p><strong>Assigned Staff:</strong> {{ $task->assigned_staff }}</p>
                                     <p><strong>Due Date:</strong> {{ $task->due_date }}</p>
+                                    <p><strong>Status:</strong> {{ $task->status }}</p>
 
                                     <!-- Display Subtasks -->
                                     @foreach ($task->subtasks as $subtask)
@@ -112,6 +115,7 @@
                                             </div>
                                             <p><strong>Assigned Staff:</strong> {{ $subtask->assigned_staff }}</p>
                                             <p><strong>Due Date:</strong> {{ $subtask->due_date }}</p>
+                                            <p><strong>Status:</strong> {{ $subtask->status }}</p>
                                         </div>
                                     @endforeach
                                 </div>
@@ -122,37 +126,4 @@
             </main>
         </div>
     </div>
-
-    <!-- JavaScript for click-based dropdowns -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Admin dropdown
-            const adminButton = document.getElementById('adminButton');
-            const adminDropdown = document.getElementById('adminDropdown');
-
-            adminButton.addEventListener('click', function (e) {
-                e.stopPropagation(); 
-                // Close filter dropdown if open
-                filterDropdown.classList.add('hidden');
-            });
-
-            // Filter dropdown
-            const filterButton = document.getElementById('filterButton');
-            const filterDropdown = document.getElementById('filterDropdown');
-
-            filterButton.addEventListener('click', function (e) {
-                e.stopPropagation();
-                // Close admin dropdown if open
-                adminDropdown.classList.add('hidden');
-                // Toggle filter dropdown
-                filterDropdown.classList.toggle('hidden');
-            });
-
-            // Hide both dropdowns when clicking anywhere else
-            document.addEventListener('click', function () {
-                adminDropdown.classList.add('hidden');
-                filterDropdown.classList.add('hidden');
-            });
-        });
-    </script>
 @endsection

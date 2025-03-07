@@ -1,4 +1,8 @@
-<x-app-layout>
+@extends('layouts.app-no-sidebar')
+
+@section('title', 'Profile')
+
+@section('content')
     <div class="py-4">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -169,165 +173,161 @@
 
     <script>
         function toggleModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
+    const modal = document.getElementById(modalId);
+    if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+    } else {
+        modal.classList.add('hidden');
+    }
+}
+
+function viewUser(userId) {
+    fetch(`/admin/user-management/users/${userId}`)
+        .then(response => response.json())
+        .then(user => {
+            if (!document.getElementById('viewUserModal')) {
+                const modalHtml = `
+                    <div id="viewUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                            <div class="mt-3 text-center">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">User Details</h3>
+                                <div class="mt-2 px-7 py-3 text-left">
+                                    <div class="mb-4">
+                                        <p class="text-sm font-bold text-gray-700">First Name:</p>
+                                        <p id="view_first_name" class="text-gray-600"></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <p class="text-sm font-bold text-gray-700">Last Name:</p>
+                                        <p id="view_last_name" class="text-gray-600"></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <p class="text-sm font-bold text-gray-700">Username:</p>
+                                        <p id="view_username" class="text-gray-600"></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <p class="text-sm font-bold text-gray-700">Email:</p>
+                                        <p id="view_email" class="text-gray-600"></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <p class="text-sm font-bold text-gray-700">Phone Number:</p>
+                                        <p id="view_phone_number" class="text-gray-600"></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <p class="text-sm font-bold text-gray-700">Role:</p>
+                                        <p id="view_role" class="text-gray-600"></p>
+                                    </div>
+                                    <div class="mb-4">
+                                        <p class="text-sm font-bold text-gray-700">Created At:</p>
+                                        <p id="view_created_at" class="text-gray-600"></p>
+                                    </div>
+                                    <div class="flex items-center justify-center mt-4">
+                                        <button type="button" onclick="toggleModal('viewUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
             }
-        }
 
-        function viewUser(userId) {
-            // Fetch user data with AJAX
-            fetch(`/admin/user-management/users/${userId}`)
-                .then(response => response.json())
-                .then(user => {
-                    // Create modal dynamically if it doesn't exist
-                    if (!document.getElementById('viewUserModal')) {
-                        const modalHtml = `
-                            <div id="viewUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-                                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                                    <div class="mt-3 text-center">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-900">User Details</h3>
-                                        <div class="mt-2 px-7 py-3 text-left">
-                                            <div class="mb-4">
-                                                <p class="text-sm font-bold text-gray-700">First Name:</p>
-                                                <p id="view_first_name" class="text-gray-600"></p>
-                                            </div>
-                                            <div class="mb-4">
-                                                <p class="text-sm font-bold text-gray-700">Last Name:</p>
-                                                <p id="view_last_name" class="text-gray-600"></p>
-                                            </div>
-                                            <div class="mb-4">
-                                                <p class="text-sm font-bold text-gray-700">Username:</p>
-                                                <p id="view_username" class="text-gray-600"></p>
-                                            </div>
-                                            <div class="mb-4">
-                                                <p class="text-sm font-bold text-gray-700">Email:</p>
-                                                <p id="view_email" class="text-gray-600"></p>
-                                            </div>
-                                            <div class="mb-4">
-                                                <p class="text-sm font-bold text-gray-700">Phone Number:</p>
-                                                <p id="view_phone_number" class="text-gray-600"></p>
-                                            </div>
-                                            <div class="mb-4">
-                                                <p class="text-sm font-bold text-gray-700">Role:</p>
-                                                <p id="view_role" class="text-gray-600"></p>
-                                            </div>
-                                            <div class="mb-4">
-                                                <p class="text-sm font-bold text-gray-700">Created At:</p>
-                                                <p id="view_created_at" class="text-gray-600"></p>
-                                            </div>
-                                            <div class="flex items-center justify-center mt-4">
-                                                <button type="button" onclick="toggleModal('viewUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                                    Close
-                                                </button>
-                                            </div>
+            // Fill the modal with user data
+            document.getElementById('view_first_name').textContent = user.first_name;
+            document.getElementById('view_last_name').textContent = user.last_name;
+            document.getElementById('view_username').textContent = user.username;
+            document.getElementById('view_email').textContent = user.email;
+            document.getElementById('view_phone_number').textContent = user.phone_number || 'N/A';
+            document.getElementById('view_role').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            document.getElementById('view_created_at').textContent = new Date(user.created_at).toLocaleString();
+
+            // Show the modal
+            toggleModal('viewUserModal');
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+            alert('Failed to load user details. Please try again.');
+        });
+}
+
+function editUser(userId) {
+    fetch(`/admin/user-management/users/${userId}`)
+        .then(response => response.json())
+        .then(user => {
+            if (!document.getElementById('editUserModal')) {
+                const modalHtml = `
+                    <div id="editUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+                        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+                            <div class="mt-3 text-center">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">Edit User</h3>
+                                <div class="mt-2 px-7 py-3">
+                                    <form id="editUserForm" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="mb-4">
+                                            <label for="edit_first_name" class="block text-gray-700 text-sm font-bold mb-2 text-left">First Name</label>
+                                            <input type="text" name="first_name" id="edit_first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                                         </div>
-                                    </div>
+                                        <div class="mb-4">
+                                            <label for="edit_last_name" class="block text-gray-700 text-sm font-bold mb-2 text-left">Last Name</label>
+                                            <input type="text" name="last_name" id="edit_last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="edit_username" class="block text-gray-700 text-sm font-bold mb-2 text-left">Username</label>
+                                            <input type="text" name="username" id="edit_username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="edit_email" class="block text-gray-700 text-sm font-bold mb-2 text-left">Email</label>
+                                            <input type="email" name="email" id="edit_email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="edit_phone_number" class="block text-gray-700 text-sm font-bold mb-2 text-left">Phone Number</label>
+                                            <input type="text" name="phone_number" id="edit_phone_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                                        </div>
+                                        <div class="mb-4">
+                                            <label for="edit_role" class="block text-gray-700 text-sm font-bold mb-2 text-left">Role</label>
+                                            <select name="role" id="edit_role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                                                <option value="admin">Admin</option>
+                                                <option value="supervisor">Supervisor</option>
+                                                <option value="staff">Staff</option>
+                                            </select>
+                                        </div>
+                                        <div class="flex items-center justify-between mt-4">
+                                            <button type="button" onclick="toggleModal('editUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                                Cancel
+                                            </button>
+                                            <button type="submit" style="background-color: #FFD100;" class="text-black font-bold py-2 px-4 rounded hover:bg-yellow-400 focus:outline-none focus:shadow-outline">
+                                                Save Changes
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
-                        `;
-                        document.body.insertAdjacentHTML('beforeend', modalHtml);
-                    }
-                    
-                    // Fill the view modal with user details
-                    document.getElementById('view_first_name').textContent = user.first_name;
-                    document.getElementById('view_last_name').textContent = user.last_name;
-                    document.getElementById('view_username').textContent = user.username;
-                    document.getElementById('view_email').textContent = user.email;
-                    document.getElementById('view_phone_number').textContent = user.phone_number || 'N/A';
-                    document.getElementById('view_role').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-                    document.getElementById('view_created_at').textContent = new Date(user.created_at).toLocaleString();
-                    
-                    // Show the modal
-                    toggleModal('viewUserModal');
-                })
-                .catch(error => {
-                    console.error('Error fetching user data:', error);
-                    alert('Failed to load user details. Please try again.');
-                });
-        }
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            }
 
-        function editUser(userId) {
-            // Fetch user data with AJAX
-            fetch(`/admin/user-management/users/${userId}`)
-                .then(response => response.json())
-                .then(user => {
-                    // Create modal dynamically if it doesn't exist
-                    if (!document.getElementById('editUserModal')) {
-                        const modalHtml = `
-                            <div id="editUserModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-                                <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-                                    <div class="mt-3 text-center">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-900">Edit User</h3>
-                                        <div class="mt-2 px-7 py-3">
-                                            <form id="editUserForm" method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                <div class="mb-4">
-                                                    <label for="edit_first_name" class="block text-gray-700 text-sm font-bold mb-2 text-left">First Name</label>
-                                                    <input type="text" name="first_name" id="edit_first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                                                </div>
-                                                <div class="mb-4">
-                                                    <label for="edit_last_name" class="block text-gray-700 text-sm font-bold mb-2 text-left">Last Name</label>
-                                                    <input type="text" name="last_name" id="edit_last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                                                </div>
-                                                <div class="mb-4">
-                                                    <label for="edit_username" class="block text-gray-700 text-sm font-bold mb-2 text-left">Username</label>
-                                                    <input type="text" name="username" id="edit_username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                                                </div>
-                                                <div class="mb-4">
-                                                    <label for="edit_email" class="block text-gray-700 text-sm font-bold mb-2 text-left">Email</label>
-                                                    <input type="email" name="email" id="edit_email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                                                </div>
-                                                <div class="mb-4">
-                                                    <label for="edit_phone_number" class="block text-gray-700 text-sm font-bold mb-2 text-left">Phone Number</label>
-                                                    <input type="text" name="phone_number" id="edit_phone_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                                                </div>
-                                                <div class="mb-4">
-                                                    <label for="edit_role" class="block text-gray-700 text-sm font-bold mb-2 text-left">Role</label>
-                                                    <select name="role" id="edit_role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                                                        <option value="admin">Admin</option>
-                                                        <option value="supervisor">Supervisor</option>
-                                                        <option value="staff">Staff</option>
-                                                    </select>
-                                                </div>
-                                                <div class="flex items-center justify-between mt-4">
-                                                    <button type="button" onclick="toggleModal('editUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                                                        Cancel
-                                                    </button>
-                                                    <button type="submit" style="background-color: #FFD100;" class="text-black font-bold py-2 px-4 rounded hover:bg-yellow-400 focus:outline-none focus:shadow-outline">
-                                                        Save Changes
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        document.body.insertAdjacentHTML('beforeend', modalHtml);
-                    }
+            // Set the form action
+            document.getElementById('editUserForm').action = `/admin/user-management/users/${userId}`;
 
-                    // Set the form action
-                    document.getElementById('editUserForm').action = `/admin/user-management/users/${userId}`;
-                    
-                    // Fill the form with user data
-                    document.getElementById('edit_first_name').value = user.first_name;
-                    document.getElementById('edit_last_name').value = user.last_name;
-                    document.getElementById('edit_username').value = user.username;
-                    document.getElementById('edit_email').value = user.email;
-                    document.getElementById('edit_phone_number').value = user.phone_number || '';
-                    document.getElementById('edit_role').value = user.role;
-                    
-                    // Show the modal
-                    toggleModal('editUserModal');
-                })
-                .catch(error => {
-                    console.error('Error fetching user data:', error);
-                    alert('Failed to load user details. Please try again.');
-                });
-        }
+            // Fill the form with user data
+            document.getElementById('edit_first_name').value = user.first_name;
+            document.getElementById('edit_last_name').value = user.last_name;
+            document.getElementById('edit_username').value = user.username;
+            document.getElementById('edit_email').value = user.email;
+            document.getElementById('edit_phone_number').value = user.phone_number || '';
+            document.getElementById('edit_role').value = user.role;
+
+            // Show the modal
+            toggleModal('editUserModal');
+        })
+        .catch(error => {
+            console.error('Error fetching user data:', error);
+            alert('Failed to load user details. Please try again.');
+        });
+}
     </script>
-</x-app-layout> 
+@endsection

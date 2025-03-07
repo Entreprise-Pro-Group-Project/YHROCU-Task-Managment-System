@@ -40,7 +40,43 @@
       @endif
     </div>
   </main>
+  <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Admin dropdown
+            const adminButton = document.getElementById('adminButton');
+            const adminDropdown = document.getElementById('adminDropdown');
+            
+            // Filter dropdown
+            const filterButton = document.getElementById('filterButton');
+            const filterDropdown = document.getElementById('filterDropdown');
 
+            if (adminButton && adminDropdown) {
+                adminButton.addEventListener('click', function (e) {
+                    e.stopPropagation(); 
+                    // Close filter dropdown if open
+                    if (filterDropdown) filterDropdown.classList.add('hidden');
+                    // Toggle admin dropdown visibility
+                    adminDropdown.classList.toggle('hidden');
+                });
+            }
+
+            if (filterButton && filterDropdown) {
+                filterButton.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    // Close admin dropdown if open
+                    if (adminDropdown) adminDropdown.classList.add('hidden');
+                    // Toggle filter dropdown visibility
+                    filterDropdown.classList.toggle('hidden');
+                });
+            }
+
+            // Hide both dropdowns when clicking anywhere else
+            document.addEventListener('click', function () {
+                if (adminDropdown) adminDropdown.classList.add('hidden');
+                if (filterDropdown) filterDropdown.classList.add('hidden');
+            });
+        });
+    </script>
   @vite(['resources/js/app.js'])
 </body>
 </html>

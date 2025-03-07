@@ -88,4 +88,3 @@ Route::prefix('admin/user_management')->name('admin.user_management.')->group(fu
 
 
 require __DIR__.'/auth.php';
-

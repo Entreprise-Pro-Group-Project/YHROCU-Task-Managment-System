@@ -1,4 +1,4 @@
-@extends('layouts.app') <!-- Extend the layout -->
+@extends('layouts.sapp') <!-- Extend the layout -->
 
 @section('content') <!-- Define the content section -->
     <div class="container mx-auto p-4">

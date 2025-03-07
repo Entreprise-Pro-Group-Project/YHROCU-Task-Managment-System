@@ -4,18 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
     // Show a specific task
     public function show(Task $task)
     {
+        if (Auth::user()->role === 'supervisor') {
+            return view('tasks.sshow', compact('task'));
+        }
         return view('tasks.show', compact('task'));
     }
 
     // Show the form for editing a task
     public function edit(Task $task)
     {
+        if (Auth::user()->role === 'supervisor') {
+            return view('tasks.sedit', compact('task'));
+        }
+
         return view('tasks.edit', compact('task'));
     }
 
@@ -44,6 +52,9 @@ class TaskController extends Controller
     // Show the form for creating a new task
     public function create()
     {
+        if (Auth::user()->role === 'supervisor') {
+            return view('tasks.screate');
+        }
         return view('tasks.create');
     }
 
@@ -57,17 +68,18 @@ class TaskController extends Controller
             'parent_id' => 'nullable|exists:tasks,id',
         ]);
 
-        // Create the task using Eloquent. 
-        // Ensure that the 'assigned_staff' field stores the staff user's first name (or desired string).
-        Task::create([
-            'task_name'      => $request->task_name,
-            'project_id'     => $request->project_id ?? null,
+        // Store the task in the session
+        $task = [
+            'id' => uniqid(), // Temporary ID for session
+            'task_name' => $request->task_name,
             'assigned_staff' => $request->assigned_staff,
-            'due_date'       => $request->due_date,
-            'parent_id'      => $request->parent_id,
-            'status'         => $request->status ?? null,
-            'comment'        => $request->comment ?? null,
-        ]);
+            'due_date' => $request->due_date,
+            'parent_id' => $request->parent_id,
+        ];
+
+        $tasks = session('tasks', []);
+        $tasks[] = $task;
+        session(['tasks' => $tasks]);
 
         return redirect()->route('projects.create')->with('success', 'Task added successfully');
     }

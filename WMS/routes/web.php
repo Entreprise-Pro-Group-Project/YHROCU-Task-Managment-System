@@ -75,7 +75,6 @@ Route::middleware('auth')->group(function () {
     
 });
 
-
 /*
 // Admin User Management Routes
 Route::prefix('admin/user_management')->name('admin.user_management.')->group(function () {

@@ -13,6 +13,9 @@ class TaskController extends Controller
     {
         if (Auth::user()->role === 'supervisor') {
             return view('tasks.sshow', compact('task'));
+        } 
+        elseif (Auth::user()->role === 'staff') {
+            return view('tasks.staffshow', compact('task'));
         }
         return view('tasks.show', compact('task'));
     }

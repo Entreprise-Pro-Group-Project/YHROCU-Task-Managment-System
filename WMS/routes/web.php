@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\DashboardController;
 
 
 Route::get('/', function () {
@@ -48,14 +49,22 @@ Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.d
 
 Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
 
-
-//User Management routes
 Route::get('/users', [App\Http\Controllers\UserController::class, 'indexView'])->name('admin.user_management.index');
 Route::post('/users', [App\Http\Controllers\UserController::class, 'store'])->name('admin.user_management.store');
 Route::get('/users/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('admin.user_management.show');
 Route::put('/users/{user}', [App\Http\Controllers\UserController::class, 'update'])->name('admin.user_management.update');
 Route::delete('/users/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('admin.user_management.destroy');
 
+/*
+Route::prefix('admin/user_management')->name('admin.user_management.')->group(function () {
+    Route::get('/users', [App\Http\Controllers\UserController::class, 'indexView'])->name('admin.user_management.index');
+    Route::post('/users', [App\Http\Controllers\UserController::class, 'store'])->name('admin.user_management.store');
+    Route::get('/users/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('admin.user_management.show');
+    Route::put('/users/{user}', [App\Http\Controllers\UserController::class, 'update'])->name('admin.user_management.update');
+    Route::delete('/users/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('admin.user_management.destroy');
+}); */
+
+Route::get('/dashboard-redirect', [DashboardController::class, 'redirect'])->name('dashboard.redirect');
 
 Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
     ->name('password.request');
@@ -74,16 +83,5 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update-profile-information-form'])->name('profile.update-profile-information-form');
     
 });
-
-/*
-// Admin User Management Routes
-Route::prefix('admin/user_management')->name('admin.user_management.')->group(function () {
-    Route::get('/users', [App\Http\Controllers\UserController::class, 'indexView'])->name('admin.user_management.index');
-    Route::post('/users', [App\Http\Controllers\UserController::class, 'store'])->name('admin.user_management.store');
-    Route::get('/users/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('admin.user_management.show');
-    Route::put('/users/{user}', [App\Http\Controllers\UserController::class, 'update'])->name('admin.user_management.update');
-    Route::delete('/users/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('admin.user_management.destroy');
-}); */
-
 
 require __DIR__.'/auth.php';

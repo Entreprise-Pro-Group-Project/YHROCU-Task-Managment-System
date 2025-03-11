@@ -22,5 +22,9 @@
                 Update Task
             </button>
         </form>
+
+        <a href="/supervisor/dashboard" class="inline-block bg-blue-400 text-white py-2 px-4 rounded hover:bg-blue-500 mt-4">
+            Back
+        </a>
     </div>
 @endsection

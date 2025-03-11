@@ -7,5 +7,8 @@
         <p><strong>Start Date:</strong> {{ $project->project_date }}</p>
         <p><strong>Due Date:</strong> {{ $project->due_date }}</p>
         <p><strong>Supervisor:</strong> {{ $project->supervisor_name }}</p>
+        <a href="/admin/dashboard" class="inline-block bg-blue-400 text-white py-2 px-4 rounded hover:bg-blue-500 mt-4">
+            Back
+        </a>
     </div>
 @endsection

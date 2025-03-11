@@ -25,7 +25,7 @@
             <aside class="w-64 bg-[#0284c7] text-white min-h-screen p-6">
                 <nav class="space-y-2">
                     <!-- Dashboard Link -->
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center p-2 rounded hover:bg-[#0273a3]">
+                    <a href="{{ route('supervisor.dashboard') }}" class="flex items-center p-2 rounded hover:bg-[#0273a3]">
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zM3 9h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
                         </svg>

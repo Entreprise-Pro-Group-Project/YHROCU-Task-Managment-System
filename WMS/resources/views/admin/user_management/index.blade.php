@@ -1,4 +1,4 @@
-@extends('layouts.app-no-sidebar')
+@extends('layouts.app')
 
 @section('title', 'Profile')
 
@@ -7,21 +7,6 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold text-gray-800">User Management</h2>
-                        <a href="{{ route('logout') }}" 
-                           class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900" 
-                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm4 10a1 1 0 110-2h4a1 1 0 110 2H7z" clip-rule="evenodd" />
-                            </svg>
-                            Log Out
-                        </a>
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-                            @csrf
-                        </form>
-                    </div>
-
                     <!-- Success Message -->
                     @if (session('success'))
                         <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -31,8 +16,9 @@
 
                     <div class="flex">
                         <!-- Sidebar -->
-                        <div class="w-1/4 pr-4">
+                        <div class="pr-4">
                             <div class="space-y-2">
+                                <h2 class="text-2xl font-semibold text-gray-800">User Management</h2>
                                 <button type="button" onclick="toggleModal('addUserModal')" style="background-color: #FFD100;" class="text-black w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
@@ -75,13 +61,13 @@
                                                 <td class="py-3 px-6 text-left">{{ ucfirst($user->role) }}</td>
                                                 <td class="py-3 px-6 text-left">
                                                     <div class="flex items-center space-x-2">
-                                                        <button onclick="viewUser({{ $user->id }})" class="text-black hover:text-gray-700">
+                                                        <button onclick="viewUser('{{ $user->id }}')" class="text-black hover:text-gray-700">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                                                                 <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
                                                             </svg>
                                                         </button>
-                                                        <button onclick="editUser({{ $user->id }})" class="text-black hover:text-gray-700">
+                                                        <button onclick="editUser('{{ $user->id }}')" class="text-black hover:text-gray-700">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                                                             </svg>
@@ -182,7 +168,7 @@
 }
 
 function viewUser(userId) {
-    fetch(`/admin/user-management/users/${userId}`)
+    fetch(`/users/${userId}`)
         .then(response => response.json())
         .then(user => {
             if (!document.getElementById('viewUserModal')) {
@@ -252,7 +238,7 @@ function viewUser(userId) {
 }
 
 function editUser(userId) {
-    fetch(`/admin/user-management/users/${userId}`)
+    fetch(`/users/${userId}`)
         .then(response => response.json())
         .then(user => {
             if (!document.getElementById('editUserModal')) {
@@ -311,7 +297,7 @@ function editUser(userId) {
             }
 
             // Set the form action
-            document.getElementById('editUserForm').action = `/admin/user-management/users/${userId}`;
+            document.getElementById('editUserForm').action = `/users/${userId}`;
 
             // Fill the form with user data
             document.getElementById('edit_first_name').value = user.first_name;

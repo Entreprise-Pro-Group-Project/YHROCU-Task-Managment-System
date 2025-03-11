@@ -96,6 +96,7 @@
                                     <p><strong>Assigned Staff:</strong> {{ $task->assigned_staff }}</p>
                                     <p><strong>Due Date:</strong> {{ $task->due_date }}</p>
                                     <p><strong>Status:</strong> {{ $task->status }}</p>
+                                    <p><strong>Comments:</strong> {{ $task->Comment }}</p>
 
                                     <!-- Display Subtasks -->
                                     @foreach ($task->subtasks as $subtask)

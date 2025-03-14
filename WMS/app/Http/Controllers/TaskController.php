@@ -33,17 +33,37 @@ class TaskController extends Controller
     // Update a task
     public function update(Request $request, Task $task)
     {
-        $request->validate([
+        // Check if the request is only updating the status (e.g. from your staff page)
+        if ($request->has('status') && !$request->hasAny(['task_name', 'assigned_staff', 'due_date', 'parent_id'])) {
+            $request->validate([
+                'status' => 'required|string|in:assigned,in progress,completed,over due',
+            ]);
+    
+            $status = $request->input('status');
+    
+            // If the due date has passed and the status is not 'completed', force status to 'over due'
+            if (\Carbon\Carbon::parse($task->due_date) < now() && $status !== 'completed') {
+                $status = 'overdue';
+            }
+    
+            $task->update(['status' => $status]);
+    
+            return redirect()->back()->with('success', 'Task status updated successfully');
+        }
+    
+        // Otherwise, process the full update (your existing code)
+        $validated = $request->validate([
             'task_name' => 'required|string|max:255',
             'assigned_staff' => 'required|string|max:255',
             'due_date' => 'required|date',
             'parent_id' => 'nullable|exists:tasks,id',
         ]);
-
-        $task->update($request->all());
-
+    
+        $task->update($validated);
+    
         return redirect()->route('admin.dashboard')->with('success', 'Task updated successfully');
     }
+    
 
     // Delete a task
     public function destroy(Task $task)

@@ -4,7 +4,11 @@
 
 @section('content')
     <div class="py-4">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-screen-xl mx-auto sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-extrabold text-gray-700 tracking-wide text-center mb-8">
+  User Management
+</h2>
+
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <!-- Success Message -->
@@ -17,9 +21,8 @@
                     <div class="flex">
                         <!-- Sidebar -->
                         <div class="pr-4">
-                            <div class="space-y-2">
-                                <h2 class="text-2xl font-semibold text-gray-800">User Management</h2>
-                                <button type="button" onclick="toggleModal('addUserModal')" style="background-color: #FFD100;" class="text-black w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
+                            <div class="flex-items-center justify-center space-y-4">
+                                <button type="button" onclick="toggleModal('addUserModal')"  class="text-black w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm bg-blue-500 hover:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
                                         <path d="M16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
@@ -36,7 +39,7 @@
                         </div>
 
                         <!-- Main Content -->
-                        <div class="w-3/4">
+                        <div class="w-5/6">
                             <div class="overflow-x-auto">
                                 <table class="min-w-full bg-white">
                                     <thead>

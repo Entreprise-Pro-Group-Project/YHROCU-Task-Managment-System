@@ -33,4 +33,17 @@ class Task extends Model
     {
         return $this->hasMany(Task::class, 'parent_id');
     }
+
+    // helper function to check if the task is overdue
+
+    public function getComputedStatusAttribute()
+    {
+        // If due date has passed and task isn’t completed, return "over due"
+        if ($this->due_date < now() && $this->status !== 'completed') {
+            return 'over due';
+        }
+        return $this->status;
+    }
+
+
 }

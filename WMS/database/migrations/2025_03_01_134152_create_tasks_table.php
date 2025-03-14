@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('parent_id')->nullable(); // Link to parent task (for sub-tasks)
             $table->string('assigned_staff');
             $table->date('due_date');
-            $table->enum('status', ['assigned', 'in progress', 'completed', 'overdue']);
+            $table->enum('status', ['assigned', 'in progress', 'completed', 'over due']);
             $table->text('comment')->nullable();
             $table->timestamps();
 

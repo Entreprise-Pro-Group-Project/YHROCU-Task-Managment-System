@@ -54,13 +54,18 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="projectsGrid">
         @foreach ($projects as $project)
             @php
-                // Determine color based on progress
+                // Calculate progress percentage: (completed tasks / total tasks) * 100
+                $totalTasks = $project->tasks->count();
+                $completedTasks = $project->tasks->where('status', 'completed')->count();
+                $progress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
+
+                // Determine header color based on progress percentage
                 $headerColor = 'bg-red-500';
-                if ($project->progress >= 75) {
+                if ($progress >= 75) {
                     $headerColor = 'bg-green-500';
-                } elseif ($project->progress >= 50) {
+                } elseif ($progress >= 50) {
                     $headerColor = 'bg-blue-500';
-                } elseif ($project->progress >= 25) {
+                } elseif ($progress >= 25) {
                     $headerColor = 'bg-yellow-500';
                 }
             @endphp
@@ -71,7 +76,7 @@
                     <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold truncate">{{ $project->project_name }}</h3>
                         <span class="bg-white/20 text-white text-sm px-2 py-1 rounded-full">
-                            {{ $project->progress }}%
+                            {{ $progress }}%
                         </span>
                     </div>
                 </div>
@@ -108,10 +113,10 @@
                     <div class="mt-4">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-sm font-medium">Progress</span>
-                            <span class="text-sm font-medium">{{ $project->progress }}%</span>
+                            <span class="text-sm font-medium">{{ $progress }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="h-2 rounded-full {{ $headerColor }}" style="width: {{ $project->progress }}%"></div>
+                            <div class="h-2 rounded-full {{ $headerColor }}" style="width: {{ $progress }}%"></div>
                         </div>
                     </div>
                 </div>
@@ -133,9 +138,8 @@
                         </svg>
                     </button>
                     
-                    <!-- Tasks Container (Hidden by default) -->
-                    
-<div class="tasks-container {{ ($status === 'all' && $loop->first) || ($status !== 'all' && count($project->tasks) > 0) ? '' : 'hidden' }} border-t">
+                    <!-- Tasks Container (Hidden by default unless filtered) -->
+                    <div class="tasks-container {{ ($status === 'all' && $loop->first) || ($status !== 'all' && count($project->tasks) > 0) ? '' : 'hidden' }} border-t">
                         <div class="p-4 space-y-3">
                             @if(count($project->tasks) > 0)
                                 @foreach($project->tasks as $task)
@@ -143,20 +147,20 @@
                                         // Check if task is overdue
                                         $isOverdue = \Carbon\Carbon::parse($task->due_date) < \Carbon\Carbon::now() && strtolower($task->status) !== 'completed';
                                         
-                                        // Determine status color
+                                        // Determine status color and display label
                                         $statusColor = 'bg-gray-100 text-gray-800 border-gray-200';
-                                        $status = strtolower($task->status);
+                                        $taskStatus = strtolower($task->status);
                                         
                                         if ($isOverdue) {
                                             $statusColor = 'bg-red-100 text-red-800 border-red-200';
                                             $displayStatus = 'Over Due';
-                                        } elseif ($status === 'completed') {
+                                        } elseif ($taskStatus === 'completed') {
                                             $statusColor = 'bg-green-100 text-green-800 border-green-200';
                                             $displayStatus = 'Completed';
-                                        } elseif ($status === 'in progress') {
+                                        } elseif ($taskStatus === 'in progress') {
                                             $statusColor = 'bg-blue-100 text-blue-800 border-blue-200';
                                             $displayStatus = 'In Progress';
-                                        } elseif ($status === 'assigned') {
+                                        } elseif ($taskStatus === 'assigned') {
                                             $statusColor = 'bg-yellow-100 text-yellow-800 border-yellow-200';
                                             $displayStatus = 'Assigned';
                                         } else {
@@ -171,12 +175,7 @@
                                                     <h4 class="font-medium">{{ $task->task_name }}</h4>
                                                     <div class="mt-1 text-sm text-gray-600">
                                                         <div>Assigned to: <span class="font-medium">{{ $task->assigned_staff }}</span></div>
-                                                        <div>Due: <span class="font-medium {{ $isOverdue ? 'text-red-600' : '' }}">
-                                                            {{ \Carbon\Carbon::parse($task->due_date)->format('M d, Y') }}
-                                                            @if($isOverdue)
-                                                                <span class="text-red-500">(Overdue)</span>
-                                                            @endif
-                                                        </span></div>
+                                                        <div>Due: <span class="font-medium">{{ \Carbon\Carbon::parse($task->due_date)->format('M d, Y') }}</span></div>
                                                     </div>
                                                 </div>
                                                 
@@ -231,7 +230,7 @@
                                                                 // Check if subtask is overdue
                                                                 $isSubtaskOverdue = \Carbon\Carbon::parse($subtask->due_date) < \Carbon\Carbon::now() && strtolower($subtask->status) !== 'completed';
                                                                 
-                                                                // Determine subtask status color
+                                                                // Determine subtask status color and display label
                                                                 $subtaskStatusColor = 'bg-gray-100 text-gray-800 border-gray-200';
                                                                 $subtaskStatus = strtolower($subtask->status);
                                                                 

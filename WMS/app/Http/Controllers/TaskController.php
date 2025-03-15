@@ -13,8 +13,7 @@ class TaskController extends Controller
     {
         if (Auth::user()->role === 'supervisor') {
             return view('tasks.sshow', compact('task'));
-        } 
-        elseif (Auth::user()->role === 'staff') {
+        } elseif (Auth::user()->role === 'staff') {
             return view('tasks.staffshow', compact('task'));
         }
         return view('tasks.show', compact('task'));
@@ -33,37 +32,42 @@ class TaskController extends Controller
     // Update a task
     public function update(Request $request, Task $task)
     {
-        // Check if the request is only updating the status (e.g. from your staff page)
+        // Check if the request is only updating the status (and optionally comment)
         if ($request->has('status') && !$request->hasAny(['task_name', 'assigned_staff', 'due_date', 'parent_id'])) {
             $request->validate([
-                'status' => 'required|string|in:assigned,in progress,completed,over due',
+                'status'  => 'required|string|in:assigned,in progress,completed,over due',
+                'comment' => 'nullable|string',
             ]);
-    
+
             $status = $request->input('status');
-    
-            // If the due date has passed and the status is not 'completed', force status to 'over due'
+            $comment = $request->input('comment', $task->comment);
+
+            // If the due date has passed and the status is not 'completed', force status to 'overdue'
             if (\Carbon\Carbon::parse($task->due_date) < now() && $status !== 'completed') {
                 $status = 'overdue';
             }
-    
-            $task->update(['status' => $status]);
-    
-            return redirect()->back()->with('success', 'Task status updated successfully');
+
+            $task->update([
+                'status'  => $status,
+                'comment' => $comment,
+            ]);
+
+            return redirect()->back()->with('success', 'Task updated successfully');
         }
-    
-        // Otherwise, process the full update (your existing code)
+
+        // Otherwise, process the full update (including comment)
         $validated = $request->validate([
-            'task_name' => 'required|string|max:255',
+            'task_name'      => 'required|string|max:255',
             'assigned_staff' => 'required|string|max:255',
-            'due_date' => 'required|date',
-            'parent_id' => 'nullable|exists:tasks,id',
+            'due_date'       => 'required|date',
+            'parent_id'      => 'nullable|exists:tasks,id',
+            'comment'        => 'nullable|string',
         ]);
-    
+
         $task->update($validated);
-    
+
         return redirect()->route('admin.dashboard')->with('success', 'Task updated successfully');
     }
-    
 
     // Delete a task
     public function destroy(Task $task)
@@ -85,19 +89,19 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'task_name' => 'required|string|max:255',
+            'task_name'      => 'required|string|max:255',
             'assigned_staff' => 'required|string|max:255',
-            'due_date' => 'required|date',
-            'parent_id' => 'nullable|exists:tasks,id',
+            'due_date'       => 'required|date',
+            'parent_id'      => 'nullable|exists:tasks,id',
         ]);
 
         // Store the task in the session
         $task = [
-            'id' => uniqid(), // Temporary ID for session
-            'task_name' => $request->task_name,
-            'assigned_staff' => $request->assigned_staff,
-            'due_date' => $request->due_date,
-            'parent_id' => $request->parent_id,
+            'id'            => uniqid(), // Temporary ID for session
+            'task_name'     => $request->task_name,
+            'assigned_staff'=> $request->assigned_staff,
+            'due_date'      => $request->due_date,
+            'parent_id'     => $request->parent_id,
         ];
 
         $tasks = session('tasks', []);

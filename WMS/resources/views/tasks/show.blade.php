@@ -6,6 +6,11 @@
         <p><strong>Task Name:</strong> {{ $task->task_name }}</p>
         <p><strong>Assigned Staff:</strong> {{ $task->assigned_staff }}</p>
         <p><strong>Due Date:</strong> {{ $task->due_date }}</p>
+                <!-- show comments -->
+        <p><strong>Comments:</strong> {{ $task->comment }}</p>
+
+
+        <!-- Add a back button to go back to the dashboard -->
         <a href="/admin/dashboard" class="inline-block bg-blue-400 text-white py-2 px-4 rounded hover:bg-blue-500 mt-4">
             Back
         </a>

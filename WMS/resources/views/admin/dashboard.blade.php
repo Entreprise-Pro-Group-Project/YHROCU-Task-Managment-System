@@ -139,7 +139,8 @@
                     </button>
                     
                     <!-- Tasks Container (Hidden by default unless filtered) -->
-                    <div class="tasks-container {{ ($status === 'all' && $loop->first) || ($status !== 'all' && count($project->tasks) > 0) ? '' : 'hidden' }} border-t">
+                    
+                    <div class="tasks-container {{ ($status === 'all') || ($status !== 'all' && count($project->tasks) > 0) ? '' : 'hidden' }} border-t">
                         <div class="p-4 space-y-3">
                             @if(count($project->tasks) > 0)
                                 @foreach($project->tasks as $task)
@@ -335,6 +336,7 @@
         
         if (filterButton && filterDropdown) {
             filterButton.addEventListener('click', function() {
+                
             });
             
             // Close dropdown when clicking outside

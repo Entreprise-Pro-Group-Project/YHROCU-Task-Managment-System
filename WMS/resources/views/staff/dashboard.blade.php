@@ -156,19 +156,16 @@
                 </span>
               </div>
               
-              <!-- Status Update Form -->
+              <!-- Status & Comment Update Form -->
               <form action="{{ route('tasks.update', $task->id) }}" method="POST" class="mb-4">
                 @csrf
                 @method('PUT')
+                
+                <!-- Status Dropdown -->
                 <div class="flex flex-col">
                   <label for="status-{{ $task->id }}" class="block text-sm font-medium text-gray-700 mb-1">Update Status:</label>
                   <div class="relative">
-                    <select 
-                      name="status" 
-                      id="status-{{ $task->id }}" 
-                      onchange="this.form.submit()" 
-                      class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-lg"
-                    >
+                    <select name="status" id="status-{{ $task->id }}" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-lg">
                       @if($isOverdue && $task->status !== 'completed')
                         <option value="over due" selected>Over Due</option>
                         <option value="in progress">Mark as In Progress</option>
@@ -185,6 +182,61 @@
                       </svg>
                     </div>
                   </div>
+                </div>
+
+                <!-- Comment Field - Improved Design -->
+                <div class="mt-5 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <label for="comment-{{ $task->id }}" class="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                    </svg>
+                    Add Comment
+                  </label>
+                  
+                  <div class="relative mt-1 group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 -m-0.5"></div>
+                    
+                    <div class="relative">
+                      <textarea 
+                        name="comment" 
+                        id="comment-{{ $task->id }}" 
+                        rows="3" 
+                        class="block w-full border border-gray-200 rounded-lg px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none shadow-sm"
+                        placeholder="Share your progress or any challenges you're facing..."
+                      >{{ old('comment', $task->comment) }}</textarea>
+                      
+                      <div class="absolute bottom-3 right-3 flex items-center space-x-1">
+                        <span id="charCount-{{ $task->id }}" class="text-xs text-gray-400">0</span>
+                        <span class="text-xs text-gray-400">/200</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Comment Suggestions -->
+                  <div class="mt-3 flex flex-wrap gap-2">
+                    <button type="button" class="comment-suggestion text-xs bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full transition-colors duration-200">
+                      Making good progress
+                    </button>
+                    <button type="button" class="comment-suggestion text-xs bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full transition-colors duration-200">
+                      Need more information
+                    </button>
+                    <button type="button" class="comment-suggestion text-xs bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full transition-colors duration-200">
+                      Will complete today
+                    </button>
+                    <button type="button" class="comment-suggestion text-xs bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full transition-colors duration-200">
+                      Facing technical issues
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-4">
+                  <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center shadow-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 22 22">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Update Task
+                  </button>
                 </div>
               </form>
               
@@ -259,6 +311,65 @@
           });
         });
       }
+      
+      // Character counter for comment fields
+      document.querySelectorAll('[id^="comment-"]').forEach(textarea => {
+        const taskId = textarea.id.split('-')[1];
+        const charCount = document.getElementById(`charCount-${taskId}`);
+        
+        if (charCount) {
+          // Update character count on load
+          charCount.textContent = textarea.value.length;
+          
+          // Update character count on input
+          textarea.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+            
+            // Visual feedback for character limit
+            if (this.value.length > 180) {
+              charCount.classList.add('text-yellow-500');
+              charCount.classList.remove('text-red-500', 'text-gray-400');
+            } else if (this.value.length > 200) {
+              charCount.classList.add('text-red-500');
+              charCount.classList.remove('text-yellow-500', 'text-gray-400');
+            } else {
+              charCount.classList.add('text-gray-400');
+              charCount.classList.remove('text-yellow-500', 'text-red-500');
+            }
+          });
+        }
+      });
+      
+      // Comment suggestions
+      document.querySelectorAll('.comment-suggestion').forEach(button => {
+        button.addEventListener('click', function() {
+          // Find the closest textarea
+          const form = this.closest('form');
+          const textarea = form.querySelector('textarea[name="comment"]');
+          const charCount = form.querySelector('[id^="charCount-"]');
+          
+          if (textarea) {
+            const suggestionText = this.textContent.trim();
+            
+            // If textarea is empty, just add the suggestion
+            // Otherwise, add a space and then the suggestion
+            if (textarea.value.trim() === '') {
+              textarea.value = suggestionText;
+            } else {
+              textarea.value = textarea.value.trim() + '. ' + suggestionText;
+            }
+            
+            // Update character count
+            if (charCount) {
+              charCount.textContent = textarea.value.length;
+            }
+            
+            // Focus the textarea and move cursor to the end
+            textarea.focus();
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+          }
+        });
+      });
     });
   </script>
   @vite(['resources/js/app.js'])

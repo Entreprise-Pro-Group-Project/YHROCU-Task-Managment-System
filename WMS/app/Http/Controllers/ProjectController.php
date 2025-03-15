@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;
+use App\Notifications\TaskAssigned;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,9 +33,9 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $request->validate([
-            'project_name' => 'required|string|max:255',
-            'project_date' => 'required|date',
-            'due_date' => 'required|date',
+            'project_name'    => 'required|string|max:255',
+            'project_date'    => 'required|date',
+            'due_date'        => 'required|date',
             'supervisor_name' => 'required|string|max:255',
         ]);
 
@@ -58,13 +60,13 @@ class ProjectController extends Controller
         return view('projects.create');
     }
 
-    // Store a new project and its tasks
+    // Store a new project and its tasks and notify the user.
     public function store(Request $request)
     {
         $request->validate([
-            'project_name' => 'required|string|max:255',
-            'project_date' => 'required|date',
-            'due_date' => 'required|date',
+            'project_name'    => 'required|string|max:255',
+            'project_date'    => 'required|date',
+            'due_date'        => 'required|date',
             'supervisor_name' => 'required|string|max:255',
         ]);
     
@@ -75,25 +77,51 @@ class ProjectController extends Controller
     
         // Create the project
         $project = Project::create([
-            'project_name' => $request->project_name,
-            'project_date' => $request->project_date,
-            'due_date' => $request->due_date,
+            'project_name'    => $request->project_name,
+            'project_date'    => $request->project_date,
+            'due_date'        => $request->due_date,
             'supervisor_name' => $request->supervisor_name,
         ]);
     
         // Create tasks for the project
         foreach (session('tasks') as $taskData) {
-            Task::create([
-                'project_id' => $project->id,
-                'task_name' => $taskData['task_name'],
-                'assigned_staff' => $taskData['assigned_staff'],
-                'due_date' => $taskData['due_date'],
-                'parent_id' => $taskData['parent_id'],
-            ]);
+            // Find the user by name
+            $user = User::where('first_name', $taskData['assigned_staff'])->first();
+            
+            if ($user) {
+                // Create the task and store the actual email in the assigned_staff column
+                $task = Task::create([
+                    'project_id'     => $project->id,
+                    'task_name'      => $taskData['task_name'],
+                    'assigned_staff' => $user->email, // Store user's email
+                    'due_date'       => $taskData['due_date'],
+                    'parent_id'      => $taskData['parent_id'] ?? null,
+                ]);
+                
+                // Notify the user via email
+                $user->notify(new TaskAssigned($task));
+            } else {
+                // Optionally, create the task without notification if user not found.
+                Task::create([
+                    'project_id'     => $project->id,
+                    'task_name'      => $taskData['task_name'],
+                    'assigned_staff' => $taskData['assigned_staff'], // Fallback, though ideally this shouldn't happen.
+                    'due_date'       => $taskData['due_date'],
+                    'parent_id'      => $taskData['parent_id'] ?? null,
+                ]);
+            }
         }
     
         // Clear tasks from session
         session()->forget('tasks');
+
+        // Look up the supervisor by first name (adjust if needed)
+        $supervisor = \App\Models\User::where('first_name', $request->supervisor_name)->first();
+        if ($supervisor) {
+        // Notify the supervisor about the new project
+        $supervisor->notify(new \App\Notifications\ProjectCreated($project));
+        }
+
     
         return redirect()->route('admin.dashboard')->with('success', 'Project and tasks created successfully');
     }

@@ -32,6 +32,7 @@ class TaskController extends Controller
     // Update a task
     public function update(Request $request, Task $task)
     {
+<<<<<<< Updated upstream
         // Check if the request is only updating the status (and optionally comment)
         if ($request->has('status') && !$request->hasAny(['task_name', 'assigned_staff', 'due_date', 'parent_id'])) {
             $request->validate([
@@ -58,13 +59,21 @@ class TaskController extends Controller
         // Otherwise, process the full update (including comment)
         $validated = $request->validate([
             'task_name'      => 'required|string|max:255',
+=======
+        $request->validate([
+            'task_name' => 'required|string|max:255',
+>>>>>>> Stashed changes
             'assigned_staff' => 'required|string|max:255',
             'due_date'       => 'required|date',
             'parent_id'      => 'nullable|exists:tasks,id',
             'comment'        => 'nullable|string',
         ]);
 
+<<<<<<< Updated upstream
         $task->update($validated);
+=======
+        $task->update($request->all());
+>>>>>>> Stashed changes
 
         return redirect()->route('admin.dashboard')->with('success', 'Task updated successfully');
     }

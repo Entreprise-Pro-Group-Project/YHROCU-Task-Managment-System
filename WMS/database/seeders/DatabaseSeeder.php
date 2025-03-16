@@ -26,5 +26,37 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'role' => 'admin',
         ]);
+
+        // Create a supervisor user
+        User::create([
+            'first_name' => 'Supervisor',
+            'last_name' => 'User',
+            'username' => 'supervisor',
+            'email' => 'supervisor@example.com',
+            'phone_number' => '2345678901',
+            'password' => Hash::make('password'),
+            'role' => 'supervisor',
+        ]);
+
+        // Create staff users
+        User::create([
+            'first_name' => 'Staff',
+            'last_name' => 'One',
+            'username' => 'staff1',
+            'email' => 'staff1@example.com',
+            'phone_number' => '3456789012',
+            'password' => Hash::make('password'),
+            'role' => 'staff',
+        ]);
+
+        User::create([
+            'first_name' => 'Staff',
+            'last_name' => 'Two',
+            'username' => 'staff2',
+            'email' => 'staff2@example.com',
+            'phone_number' => '4567890123',
+            'password' => Hash::make('password'),
+            'role' => 'staff',
+        ]);
     }
 }

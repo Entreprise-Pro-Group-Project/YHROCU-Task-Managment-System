@@ -10,8 +10,8 @@ class StaffController extends Controller
 {
     public function dashboard(Request $request)
     {
-        // Start by filtering tasks assigned to the current user
-        $tasksQuery = Task::where('assigned_staff', Auth::user()->first_name);
+        // Start by filtering tasks assigned to the current user's email
+        $tasksQuery = Task::where('assigned_staff', Auth::user()->email);
 
         // Get the selected status from the query parameter, defaulting to 'all'
         $status = $request->query('status', 'all');

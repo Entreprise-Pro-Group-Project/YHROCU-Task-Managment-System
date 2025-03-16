@@ -119,5 +119,10 @@
             });
         });
     </script>
+
+    <script src="{{ asset('js/app.js') }}" defer></script>
+    
+    <!-- Add script stack -->
+    @stack('scripts')
 </body>
 </html>

@@ -51,7 +51,7 @@ class ProjectCreated extends Notification implements ShouldQueue
                     ->line('Project Date: ' . $this->project->project_date)
                     ->line('Due Date: ' . $this->project->due_date)
                     ->action('View Project', url('/projects/' . $this->project->id))
-                    ->line('Thank you for using our system!');
+                    ->line('Thank you for using YHROCU Workflow Management System!');
     }
 
     /**

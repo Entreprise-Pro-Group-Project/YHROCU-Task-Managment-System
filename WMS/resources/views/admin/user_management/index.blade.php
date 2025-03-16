@@ -18,6 +18,13 @@
                         </div>
                     @endif
 
+                    <!-- Error Message -->
+                    @if ($errors->has('general'))
+                        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <span class="block sm:inline">{{ $errors->first('general') }}</span>
+                        </div>
+                    @endif
+
                     <div class="flex">
                         <!-- Sidebar -->
                         <div class="pr-4">
@@ -108,39 +115,75 @@
             <div class="mt-3 text-center">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">Add New User</h3>
                 <div class="mt-2 px-7 py-3">
-                    <form action="{{ route('admin.user_management.store') }}" method="POST">
+                    <!-- Display all validation errors at the top -->
+                    @if ($errors->any())
+                        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative text-left">
+                            <strong class="font-bold">Please fix the following errors:</strong>
+                            <ul class="mt-2 list-disc list-inside">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
+                    <form action="{{ route('admin.user_management.store') }}" method="POST" id="addUserForm">
                         @csrf
                         <div class="mb-4">
                             <label for="first_name" class="block text-gray-700 text-sm font-bold mb-2 text-left">First Name</label>
-                            <input type="text" name="first_name" id="first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <input type="text" name="first_name" id="first_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('first_name') border-red-500 @enderror" value="{{ old('first_name') }}" required>
+                            @error('first_name')
+                                <p class="text-red-500 text-xs italic mt-1 text-left">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="mb-4">
                             <label for="last_name" class="block text-gray-700 text-sm font-bold mb-2 text-left">Last Name</label>
-                            <input type="text" name="last_name" id="last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <input type="text" name="last_name" id="last_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('last_name') border-red-500 @enderror" value="{{ old('last_name') }}" required>
+                            @error('last_name')
+                                <p class="text-red-500 text-xs italic mt-1 text-left">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="mb-4">
                             <label for="username" class="block text-gray-700 text-sm font-bold mb-2 text-left">Username</label>
-                            <input type="text" name="username" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <input type="text" name="username" id="username" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('username') border-red-500 @enderror" value="{{ old('username') }}" required>
+                            @error('username')
+                                <p class="text-red-500 text-xs italic mt-1 text-left">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="mb-4">
                             <label for="email" class="block text-gray-700 text-sm font-bold mb-2 text-left">Email</label>
-                            <input type="email" name="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <input type="email" name="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('email') border-red-500 @enderror" value="{{ old('email') }}" required>
+                            @error('email')
+                                <p class="text-red-500 text-xs italic mt-1 text-left">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="mb-4">
                             <label for="phone_number" class="block text-gray-700 text-sm font-bold mb-2 text-left">Phone Number</label>
-                            <input type="text" name="phone_number" id="phone_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <input type="text" name="phone_number" id="phone_number" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('phone_number') border-red-500 @enderror" value="{{ old('phone_number') }}">
+                            @error('phone_number')
+                                <p class="text-red-500 text-xs italic mt-1 text-left">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="mb-4">
                             <label for="role" class="block text-gray-700 text-sm font-bold mb-2 text-left">Role</label>
-                            <select name="role" id="role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-                                <option value="admin">Admin</option>
-                                <option value="supervisor">Supervisor</option>
-                                <option value="staff">Staff</option>
+                            <select name="role" id="role" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('role') border-red-500 @enderror" required>
+                                <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="supervisor" {{ old('role') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
+                                <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
                             </select>
+                            @error('role')
+                                <p class="text-red-500 text-xs italic mt-1 text-left">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="mb-4">
                             <label for="password" class="block text-gray-700 text-sm font-bold mb-2 text-left">Password</label>
-                            <input type="password" name="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                            <input type="password" name="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('password') border-red-500 @enderror" required>
+                            @error('password')
+                                <p class="text-red-500 text-xs italic mt-1 text-left">{{ $message }}</p>
+                            @enderror
+                            <p class="text-gray-600 text-xs italic mt-1 text-left">
+                                Password must contain at least 8 characters, including uppercase, lowercase, number, and special character.
+                            </p>
                         </div>
                         <div class="mb-4">
                             <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2 text-left">Confirm Password</label>
@@ -318,5 +361,12 @@ function editUser(userId) {
             alert('Failed to load user details. Please try again.');
         });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if there are any validation errors - if so, open the Add User modal
+    @if($errors->any())
+        toggleModal('addUserModal');
+    @endif
+});
     </script>
 @endsection

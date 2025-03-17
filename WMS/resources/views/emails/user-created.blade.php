@@ -3,11 +3,13 @@
 
 Hello {{ $user->first_name }} {{ $user->last_name }},
 
-An administrator has created an account for you in the {{ config('app.name') }} .
+An administrator has created an account for you in the {{ config('app.name') }}.
 
 ## Your Login Credentials
-**Username/Email:** {{ $user->email }}  
-**Password:** {{ $plainPassword }}
+**Username:** {{ $user->username }}  
+**Email:** {{ $user->email }}  
+**Password:** {{ $plainPassword }}  
+**Role:** {{ ucfirst($user->role) }}
 
 Please log in using your email address and password.
 

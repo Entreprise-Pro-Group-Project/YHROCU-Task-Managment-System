@@ -193,7 +193,7 @@
                             <button type="button" onclick="toggleModal('addUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Cancel
                             </button>
-                            <button type="submit" style="background-color: #FFD100;" class="text-black font-bold py-2 px-4 rounded hover:bg-yellow-400 focus:outline-none focus:shadow-outline">
+                            <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 Add User
                             </button>
                         </div>
@@ -329,7 +329,7 @@ function editUser(userId) {
                                             <button type="button" onclick="toggleModal('editUserModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                                 Cancel
                                             </button>
-                                            <button type="submit" style="background-color: #FFD100;" class="text-black font-bold py-2 px-4 rounded hover:bg-yellow-400 focus:outline-none focus:shadow-outline">
+                                            <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                                 Save Changes
                                             </button>
                                         </div>

@@ -11,7 +11,7 @@ An administrator has created an account for you in the {{ config('app.name') }}.
 **Password:** {{ $plainPassword }}  
 **Role:** {{ ucfirst($user->role) }}
 
-Please log in using your email address and password.
+Please log in using your login credentials and change your password after your first login.
 
 @component('mail::button', ['url' => route('login')])
 Login Now

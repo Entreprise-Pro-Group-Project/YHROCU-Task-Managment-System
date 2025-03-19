@@ -6,6 +6,9 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use App\Notifications\TaskAssigned;
+use App\Notifications\ProjectCreated;
+use App\Notifications\ProjectUpdated;
+use App\Notifications\ProjectDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,13 +45,28 @@ class ProjectController extends Controller
 
         $project->update($request->all());
 
+        // Notify the supervisor about the update.
+        // Here we look up the supervisor by first name.
+        $supervisor = User::where('first_name', $request->supervisor_name)->first();
+        if ($supervisor) {
+            $supervisor->notify(new ProjectUpdated($project));
+        }
+
         return redirect()->route('admin.dashboard')->with('success', 'Project updated successfully');
     }
 
     // Delete a project
     public function destroy(Project $project)
     {
+        // Look up the supervisor by the project's supervisor_name (first name)
+        $supervisor = User::where('first_name', $project->supervisor_name)->first();
+        if ($supervisor) {
+            // Notify the supervisor about the deletion before removing the project
+            $supervisor->notify(new ProjectDeleted($project));
+        }
+        
         $project->delete();
+
         return redirect()->route('admin.dashboard')->with('success', 'Project deleted successfully');
     }
     
@@ -61,7 +79,7 @@ class ProjectController extends Controller
         return view('projects.create');
     }
 
-    // Store a new project and its tasks and notify the user.
+    // Store a new project and its tasks and notify the supervisor.
     public function store(Request $request)
     {
         $request->validate([
@@ -88,7 +106,7 @@ class ProjectController extends Controller
     
         // Create tasks for the project
         foreach (session('tasks') as $taskData) {
-            // Find the user by name
+            // Look up the user by name (assuming assigned_staff holds the user's first name)
             $user = User::where('first_name', $taskData['assigned_staff'])->first();
             
             
@@ -122,14 +140,13 @@ class ProjectController extends Controller
     
         // Clear tasks from session
         session()->forget('tasks');
-
-        // Look up the supervisor by first name (adjust if needed)
-        $supervisor = \App\Models\User::where('first_name', $request->supervisor_name)->first();
+    
+        // Look up the supervisor by first name (from supervisor_name field)
+        $supervisor = User::where('first_name', $request->supervisor_name)->first();
         if ($supervisor) {
-        // Notify the supervisor about the new project
-        $supervisor->notify(new \App\Notifications\ProjectCreated($project));
+            // Notify the supervisor about the new project
+            $supervisor->notify(new ProjectCreated($project));
         }
-
     
         return redirect()->route('admin.dashboard')->with('success', 'Project and tasks created successfully');
     }

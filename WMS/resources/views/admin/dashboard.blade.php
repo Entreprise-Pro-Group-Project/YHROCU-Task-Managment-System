@@ -116,7 +116,7 @@
                             <span class="text-sm font-medium">{{ $progress }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="h-2 rounded-full {{ $headerColor }}" style="width: {{ $progress }}%"></div>
+                            <div class="h-2 rounded-full {{ $headerColor }}" style="width: '{{ $progress }}%';"></div>
                         </div>
                     </div>
                 </div>

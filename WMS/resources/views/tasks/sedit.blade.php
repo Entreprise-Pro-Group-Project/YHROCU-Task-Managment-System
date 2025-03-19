@@ -11,8 +11,16 @@
                 <input type="text" name="task_name" id="task_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ $task->task_name }}" required>
             </div>
             <div class="mb-4">
+                <label for="task_description" class="block text-sm font-medium text-gray-700">Task Description</label>
+                <textarea name="task_description" id="task_description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></textarea>
+            </div>
+            <div class="mb-4">
                 <label for="assigned_staff" class="block text-sm font-medium text-gray-700">Assigned Staff</label>
                 <input type="text" name="assigned_staff" id="assigned_staff" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ $task->assigned_staff }}" required>
+            </div>
+            <div class="mb-4">
+                <label for="assigned_date" class="block text-sm font-medium text-gray-700">Assigned Date</label>
+                <input type="date" name="assigned_date" id="assigned_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
             </div>
             <div class="mb-4">
                 <label for="due_date" class="block text-sm font-medium text-gray-700">Due Date</label>

@@ -58,7 +58,9 @@ class TaskController extends Controller
         // Otherwise, process the full update (including comment)
         $validated = $request->validate([
             'task_name'      => 'required|string|max:255',
+            'task_description' => 'required|string',
             'assigned_staff' => 'required|string|max:255',
+            'assigned_date'  => 'required|date',
             'due_date'       => 'required|date',
             'parent_id'      => 'nullable|exists:tasks,id',
             'comment'        => 'nullable|string',
@@ -90,18 +92,22 @@ class TaskController extends Controller
     {
         $request->validate([
             'task_name'      => 'required|string|max:255',
+            'task_description' => 'required|string',
             'assigned_staff' => 'required|string|max:255',
+            'assigned_date'  => 'required|date',
             'due_date'       => 'required|date',
             'parent_id'      => 'nullable|exists:tasks,id',
         ]);
 
         // Store the task in the session
         $task = [
-            'id'            => uniqid(), // Temporary ID for session
-            'task_name'     => $request->task_name,
-            'assigned_staff'=> $request->assigned_staff,
-            'due_date'      => $request->due_date,
-            'parent_id'     => $request->parent_id,
+            'id'               => uniqid(), // Temporary ID for session
+            'task_name'        => $request->task_name,
+            'task_description' => $request->task_description,
+            'assigned_staff'   => $request->assigned_staff,
+            'assigned_date'    => $request->assigned_date,
+            'due_date'         => $request->due_date,
+            'parent_id'        => $request->parent_id,
         ];
 
         $tasks = session('tasks', []);

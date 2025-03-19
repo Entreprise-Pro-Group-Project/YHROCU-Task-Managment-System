@@ -11,6 +11,10 @@
                 <input type="text" name="project_name" id="project_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ $project->project_name }}" required>
             </div>
             <div class="mb-4">
+                <label for="project_description" class="block text-sm font-medium text-gray-700">Project Description</label>
+                <textarea name="project_description" id="project_description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>{{ $project->project_description }}</textarea>
+            </div>
+            <div class="mb-4">
                 <label for="project_date" class="block text-sm font-medium text-gray-700">Project Date</label>
                 <input type="date" name="project_date" id="project_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ $project->project_date }}" required>
             </div>

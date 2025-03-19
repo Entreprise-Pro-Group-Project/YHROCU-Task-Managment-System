@@ -136,6 +136,7 @@
             <div class="p-5 pl-6">
               <div class="flex justify-between items-start mb-3">
                 <h3 class="text-lg font-semibold text-gray-800 pr-2">{{ $task->task_name }}</h3>
+                <p>Task Description: {{ $task->description }}</p>
                 <span class="status-badge px-3 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
                   {{ ucfirst($task->status) }}
                 </span>

@@ -34,6 +34,7 @@ class ProjectController extends Controller
     {
         $request->validate([
             'project_name'    => 'required|string|max:255',
+            'project_description' => 'required|string',
             'project_date'    => 'required|date',
             'due_date'        => 'required|date',
             'supervisor_name' => 'required|string|max:255',
@@ -65,6 +66,7 @@ class ProjectController extends Controller
     {
         $request->validate([
             'project_name'    => 'required|string|max:255',
+            'project_description' => 'required|string',
             'project_date'    => 'required|date',
             'due_date'        => 'required|date',
             'supervisor_name' => 'required|string|max:255',
@@ -78,6 +80,7 @@ class ProjectController extends Controller
         // Create the project
         $project = Project::create([
             'project_name'    => $request->project_name,
+            'project_description' => $request->project_description,
             'project_date'    => $request->project_date,
             'due_date'        => $request->due_date,
             'supervisor_name' => $request->supervisor_name,
@@ -88,14 +91,17 @@ class ProjectController extends Controller
             // Find the user by name
             $user = User::where('first_name', $taskData['assigned_staff'])->first();
             
+            
             if ($user) {
                 // Create the task and store the actual email in the assigned_staff column
                 $task = Task::create([
-                    'project_id'     => $project->id,
-                    'task_name'      => $taskData['task_name'],
-                    'assigned_staff' => $user->email, // Store user's email
-                    'due_date'       => $taskData['due_date'],
-                    'parent_id'      => $taskData['parent_id'] ?? null,
+                    'project_id'       => $project->id,
+                    'task_name'        => $taskData['task_name'],
+                    'task_description' => $taskData['task_description'],
+                    'assigned_staff'   => $user->email, // Store user's email
+                    'assigned_date'    => $taskData['assigned_date'],
+                    'due_date'         => $taskData['due_date'],
+                    'parent_id'        => $taskData['parent_id'] ?? null,
                 ]);
                 
                 // Notify the user via email
@@ -103,11 +109,13 @@ class ProjectController extends Controller
             } else {
                 // Optionally, create the task without notification if user not found.
                 Task::create([
-                    'project_id'     => $project->id,
-                    'task_name'      => $taskData['task_name'],
-                    'assigned_staff' => $taskData['assigned_staff'], // Fallback, though ideally this shouldn't happen.
-                    'due_date'       => $taskData['due_date'],
-                    'parent_id'      => $taskData['parent_id'] ?? null,
+                    'project_id'       => $project->id,
+                    'task_name'        => $taskData['task_name'],
+                    'task_description' => $taskData['task_description'],
+                    'assigned_staff'   => $taskData['assigned_staff'], // Fallback, though ideally this shouldn't happen.
+                    'assigned_date'    => $taskData['assigned_date'],
+                    'due_date'         => $taskData['due_date'],
+                    'parent_id'        => $taskData['parent_id'] ?? null,
                 ]);
             }
         }

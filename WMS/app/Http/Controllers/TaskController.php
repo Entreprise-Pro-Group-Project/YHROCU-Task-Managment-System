@@ -5,20 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User; 
+
 
 class TaskController extends Controller
 {
     // Show a specific task
     public function show(Task $task)
-    {
-        if (Auth::user()->role === 'supervisor') {
-            return view('tasks.sshow', compact('task'));
-        } elseif (Auth::user()->role === 'staff') {
-            return view('tasks.staffshow', compact('task'));
-        }
-        return view('tasks.show', compact('task'));
+{
+    // Fetch all users, or filter to only staff if needed:
+    $users = User::where('role', 'staff')->get();
+    
+    if (Auth::user()->role === 'supervisor') {
+        return view('tasks.sshow', compact('task', 'users'));
+    } elseif (Auth::user()->role === 'staff') {
+        return view('tasks.staffshow', compact('task', 'users'));
     }
-
+    return view('tasks.show', compact('task', 'users'));
+}
     // Show the form for editing a task
     public function edit(Task $task)
     {

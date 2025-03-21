@@ -180,9 +180,10 @@
                                                     </div>
                                                 </div>
                                                 
-                                                <span class="px-2 py-1 text-xs rounded-full {{ $statusColor }}">
-                                                    {{ $displayStatus }}
-                                                </span>
+                                                <span class="px-2 py-1 text-xs rounded-full {{ $statusColor }} whitespace-nowrap">
+    {{ $displayStatus }}
+</span>
+
                                             </div>
                                             
                                             @if($task->Comment)

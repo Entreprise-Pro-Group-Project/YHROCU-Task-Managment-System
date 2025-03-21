@@ -30,21 +30,57 @@
       bottom: 0;
       border-radius: 4px 0 0 4px;
     }
+    /* Add dropdown animation */
+    .dropdown-appear {
+      animation: dropdownFade 0.2s ease-out;
+    }
+    @keyframes dropdownFade {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
   @include('layouts.navigation')
 
-  <main class="container mx-auto px-4 py-8">
+  <main class="container mx-auto px-4 py-8 max-w-7xl">
     <!-- Page Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-800">My Tasks</h1>
-      <p class="text-gray-600 mt-2">Manage and update your assigned tasks</p>
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800">My Tasks</h1>
+        <p class="text-gray-600 mt-2">Manage and update your assigned tasks</p>
+      </div>
+      
+      <!-- Admin Button (if needed) -->
+      @if(auth()->user()->is_admin ?? false)
+      <div class="relative">
+        <button
+          id="adminButton"
+          class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 font-medium"
+        >
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Admin</span>
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <!-- Admin Dropdown -->
+        <div id="adminDropdown" class="hidden absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-20 overflow-hidden">
+          <a href="{{ route('admin.dashboard') }}" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 border-b border-gray-100">Dashboard</a>
+          <a href="{{ route('admin.users') }}" class="block px-4 py-3 text-gray-700 hover:bg-purple-50 border-b border-gray-100">Manage Users</a>
+          <a href="{{ route('admin.tasks') }}" class="block px-4 py-3 text-gray-700 hover:bg-purple-50">Manage Tasks</a>
+        </div>
+      </div>
+      @endif
     </div>
 
     <!-- Filter & Search -->
-    <div class="bg-white rounded-xl shadow-sm p-4 mb-8">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="bg-white rounded-xl shadow-sm p-5 mb-8">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <!-- Filter Dropdown -->
         <div class="relative">
           <button
@@ -136,7 +172,6 @@
             <div class="p-5 pl-6">
               <div class="flex justify-between items-start mb-3">
                 <h3 class="text-lg font-semibold text-gray-800 pr-2">{{ $task->task_name }}</h3>
-                <p>Task Description: {{ $task->description }}</p>
                 <span class="status-badge px-3 py-1 rounded-full text-xs font-medium {{ $statusColor }}">
                   {{ ucfirst($task->status) }}
                 </span>
@@ -150,19 +185,23 @@
                 <span class="{{ $isOverdue ? 'text-red-500 font-medium' : 'text-gray-600' }}">
                   {{ $formattedDate }}
                   @if($isOverdue)
-                    <span class="text-red-500 font-medium">({{ abs($daysLeft) }} {{ abs($daysLeft) == 1 ? 'day' : 'days' }} overdue)</span>
+                    <span class="text-red-500 font-medium">
+                      ({{ abs($daysLeft) }} {{ abs($daysLeft) == 1 ? 'day' : 'days' }} overdue)
+                    </span>
                   @elseif($daysLeft < 0)
-                    <span class="text-yellow-600">({{ abs($daysLeft) }} {{ abs($daysLeft) == 1 ? 'day' : 'days' }} left)</span>
+                    <span class="text-yellow-600">
+                      ({{ abs($daysLeft) }} {{ abs($daysLeft) == 1 ? 'day' : 'days' }} left)
+                    </span>
                   @endif
                 </span>
               </div>
               
-              <!-- Status & Comment Update Form -->
-              <form action="{{ route('tasks.update', $task->id) }}" method="POST" class="mb-4">
+              <!-- Status Update Form (Auto-submit on change) -->
+              <form action="{{ route('tasks.update', $task->id) }}" method="POST" class="mb-4 auto-submit-form">
                 @csrf
                 @method('PUT')
                 
-                <!-- Status Dropdown -->
+                <!-- Status Dropdown Only -->
                 <div class="flex flex-col">
                   <label for="status-{{ $task->id }}" class="block text-sm font-medium text-gray-700 mb-1">Update Status:</label>
                   <div class="relative">
@@ -184,65 +223,11 @@
                     </div>
                   </div>
                 </div>
-
-                <!-- Comment Field - Improved Design -->
-                <div class="mt-5 bg-gray-50 rounded-xl p-4 border border-gray-100">
-                  <label for="comment-{{ $task->id }}" class="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                    </svg>
-                    Add Comment
-                  </label>
-                  
-                  <div class="relative mt-1 group">
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 -m-0.5"></div>
-                    
-                    <div class="relative">
-                      <textarea 
-                        name="comment" 
-                        id="comment-{{ $task->id }}" 
-                        rows="3" 
-                        class="block w-full border border-gray-200 rounded-lg px-4 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none shadow-sm"
-                        placeholder="Share your progress or any challenges you're facing..."
-                      >{{ old('comment', $task->comment) }}</textarea>
-                      
-                      <div class="absolute bottom-3 right-3 flex items-center space-x-1">
-                        <span id="charCount-{{ $task->id }}" class="text-xs text-gray-400">0</span>
-                        <span class="text-xs text-gray-400">/200</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- Comment Suggestions -->
-                  <div class="mt-3 flex flex-wrap gap-2">
-                    <button type="button" class="comment-suggestion text-xs bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full transition-colors duration-200">
-                      Making good progress
-                    </button>
-                    <button type="button" class="comment-suggestion text-xs bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full transition-colors duration-200">
-                      Need more information
-                    </button>
-                    <button type="button" class="comment-suggestion text-xs bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full transition-colors duration-200">
-                      Will complete today
-                    </button>
-                    <button type="button" class="comment-suggestion text-xs bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 px-3 py-1.5 rounded-full transition-colors duration-200">
-                      Facing technical issues
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="mt-4">
-                  <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 flex items-center justify-center shadow-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 22 22">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Update Task
-                  </button>
-                </div>
+                <!-- Note: The update button is removed. The form will auto-submit when the selection changes. -->
               </form>
               
-              <!-- Action Button -->
-              <div class="flex justify-end">
+              <!-- Action Button: View Details (where the comment section is located) -->
+              <div class="flex justify-center py-2"> 
                 <a href="{{ route('tasks.show', $task->id) }}" class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">
                   <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -257,7 +242,6 @@
       @endif
     </div>
   </main>
-
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       // Admin dropdown
@@ -268,13 +252,29 @@
       const filterButton = document.getElementById('filterButton');
       const filterDropdown = document.getElementById('filterDropdown');
 
+      // Function to toggle dropdown with animation
+      function toggleDropdown(dropdown) {
+        if (dropdown.classList.contains('hidden')) {
+          dropdown.classList.remove('hidden');
+          dropdown.classList.add('dropdown-appear');
+        } else {
+          dropdown.classList.add('hidden');
+        }
+      }
+      
+      // Function to close all dropdowns
+      function closeAllDropdowns() {
+        if (adminDropdown) adminDropdown.classList.add('hidden');
+        if (filterDropdown) filterDropdown.classList.add('hidden');
+      }
+
       if (adminButton && adminDropdown) {
         adminButton.addEventListener('click', function (e) {
           e.stopPropagation(); 
           // Close filter dropdown if open
           if (filterDropdown) filterDropdown.classList.add('hidden');
           // Toggle admin dropdown visibility
-          adminDropdown.classList.toggle('hidden');
+          toggleDropdown(adminDropdown);
         });
       }
 
@@ -284,14 +284,18 @@
           // Close admin dropdown if open
           if (adminDropdown) adminDropdown.classList.add('hidden');
           // Toggle filter dropdown visibility
-          filterDropdown.classList.toggle('hidden');
+          toggleDropdown(filterDropdown);
         });
       }
 
       // Hide both dropdowns when clicking anywhere else
-      document.addEventListener('click', function () {
-        if (adminDropdown) adminDropdown.classList.add('hidden');
-        if (filterDropdown) filterDropdown.classList.add('hidden');
+      document.addEventListener('click', closeAllDropdowns);
+      
+      // Auto-submit status changes
+      document.querySelectorAll('.auto-submit-form select').forEach(select => {
+        select.addEventListener('change', function() {
+          this.closest('form').submit();
+        });
       });
       
       // Search functionality
@@ -301,15 +305,43 @@
       if (searchInput) {
         searchInput.addEventListener('input', function() {
           const searchTerm = this.value.toLowerCase().trim();
+          let hasVisibleCards = false;
           
           taskCards.forEach(card => {
             const taskName = card.getAttribute('data-task-name');
             if (taskName.includes(searchTerm)) {
               card.classList.remove('hidden');
+              hasVisibleCards = true;
             } else {
               card.classList.add('hidden');
             }
           });
+          
+          // Show "no results" message if needed
+          const noResultsElement = document.getElementById('noSearchResults');
+          const tasksGrid = document.getElementById('tasksGrid');
+          
+          if (!hasVisibleCards && searchTerm !== '') {
+            // Create "no results" message if it doesn't exist
+            if (!noResultsElement) {
+              const noResults = document.createElement('div');
+              noResults.id = 'noSearchResults';
+              noResults.className = 'col-span-full text-center py-10';
+              noResults.innerHTML = `
+                <svg class="h-12 w-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <p class="text-gray-500">No tasks matching "<span id="searchTermDisplay"></span>"</p>
+              `;
+              tasksGrid.appendChild(noResults);
+              document.getElementById('searchTermDisplay').textContent = searchTerm;
+            } else {
+              noResultsElement.classList.remove('hidden');
+              document.getElementById('searchTermDisplay').textContent = searchTerm;
+            }
+          } else if (noResultsElement) {
+            noResultsElement.classList.add('hidden');
+          }
         });
       }
       

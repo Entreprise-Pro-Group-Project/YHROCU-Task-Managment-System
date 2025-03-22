@@ -147,7 +147,12 @@ class ProjectController extends Controller
             // Notify the supervisor about the new project
             $supervisor->notify(new ProjectCreated($project));
         }
+        if (Auth::user()->role === 'supervisor') {
+            return redirect()->route('supervisor.dashboard')->with('success', 'Project created successfully');
+        } else {
+            return redirect()->route('admin.dashboard')->with('success', 'Project created successfully');
+        }
+        
     
-        return redirect()->route('admin.dashboard')->with('success', 'Project and tasks created successfully');
     }
 }

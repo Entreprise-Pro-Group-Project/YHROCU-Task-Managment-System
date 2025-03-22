@@ -71,7 +71,17 @@ Route::middleware('auth')->group(function () {
     Route::get('tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
     Route::put('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-    
+
+    // task reassign route
+
+Route::put('/tasks/{task}/reassign', [TaskController::class, 'reassign'])->name('tasks.reassign');
+
+// updating due date route
+
+
+Route::put('/tasks/{task}/update-due-date', [TaskController::class, 'updateDueDate'])->name('tasks.update.due_date');
+
+
     // Task Comments Routes
 
 Route::post('/tasks/{task}/comment', [TaskCommentController::class, 'store'])

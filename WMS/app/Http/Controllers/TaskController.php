@@ -12,26 +12,47 @@ class TaskController extends Controller
 {
     // Show a specific task
     public function show(Task $task)
-{
-    // Fetch all users, or filter to only staff if needed:
-    $users = User::where('role', 'staff')->get();
-    
-    if (Auth::user()->role === 'supervisor') {
-        return view('tasks.sshow', compact('task', 'users'));
-    } elseif (Auth::user()->role === 'staff') {
-        return view('tasks.staffshow', compact('task', 'users'));
+    {
+        // Retrieve all users with the 'staff' role, ordered by first name
+        $users = User::where('role', 'staff')->orderBy('first_name')->get();
+        
+        if (Auth::user()->role === 'supervisor') {
+            return view('tasks.sshow', compact('task', 'users'));
+        } elseif (Auth::user()->role === 'staff') {
+            return view('tasks.staffshow', compact('task', 'users'));
+        }
+        return view('tasks.show', compact('task', 'users'));
     }
-    return view('tasks.show', compact('task', 'users'));
-}
     // Show the form for editing a task
     public function edit(Task $task)
-    {
-        if (Auth::user()->role === 'supervisor') {
-            return view('tasks.sedit', compact('task'));
-        }
+{
+    // Retrieve all users with the 'staff' role, ordered by first name
+    $users = User::where('role', 'staff')->orderBy('first_name')->get();
 
-        return view('tasks.edit', compact('task'));
+    if (Auth::user()->role === 'supervisor') {
+        return view('tasks.sedit', compact('task', 'users'));
     }
+    return view('tasks.edit', compact('task', 'users'));
+}
+
+public function updateDueDate(Request $request, Task $task)
+{
+    // Validate the due_date field
+    $validated = $request->validate([
+        'due_date' => 'required|date',
+    ]);
+
+    // Update only the due_date field
+    $task->update($validated);
+
+    if (Auth::user()->role === 'supervisor') {
+        return redirect()->route('supervisor.dashboard')->with('success', 'Project created successfully');
+    } else {
+        return redirect()->route('admin.dashboard')->with('success', 'Project created successfully');
+    }
+    }
+
+
 
     // Update a task
     public function update(Request $request, Task $task)
@@ -90,6 +111,24 @@ class TaskController extends Controller
         }
         return view('tasks.create');
     }
+
+    // Reassign a task to a different staff member
+
+    public function reassign(Request $request, Task $task)
+{
+    // Validate that a staff member was selected
+    $validated = $request->validate([
+        'assigned_staff' => 'required|string|max:255',
+    ]);
+
+    // Update the task with the new assigned_staff
+    $task->update($validated);
+
+    return redirect()->back()->with('success', 'Task reassigned successfully.');
+}
+
+
+
 
     // Store a new task in the database
     public function store(Request $request)

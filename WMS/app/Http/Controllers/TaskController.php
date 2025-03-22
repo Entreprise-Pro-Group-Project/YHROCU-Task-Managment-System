@@ -23,6 +23,7 @@ class TaskController extends Controller
         }
         return view('tasks.show', compact('task', 'users'));
     }
+    
     // Show the form for editing a task
     public function edit(Task $task)
 {
@@ -143,20 +144,15 @@ public function updateDueDate(Request $request, Task $task)
         ]);
 
         // Store the task in the session
-        $task = [
-            'id'               => uniqid(), // Temporary ID for session
+        $task = Task::create([
             'task_name'        => $request->task_name,
             'task_description' => $request->task_description,
             'assigned_staff'   => $request->assigned_staff,
             'assigned_date'    => $request->assigned_date,
             'due_date'         => $request->due_date,
-            'parent_id'        => $request->parent_id,
-        ];
-
-        $tasks = session('tasks', []);
-        $tasks[] = $task;
-        session(['tasks' => $tasks]);
-
+            'parent_id'        => $request->parent_id, // This will only be set if it's a sub-task
+        ]);
+    
         return redirect()->route('projects.create')->with('success', 'Task added successfully');
     }
 }

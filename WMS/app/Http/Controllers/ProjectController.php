@@ -45,14 +45,29 @@ class ProjectController extends Controller
 
         $project->update($request->all());
 
+        // Update or add new tasks
+        if ($request->has('tasks')) {
+            foreach ($request->tasks as $taskData) {
+                if (!empty($taskData['task_name'])) {
+                    Task::updateOrCreate(
+                        ['id' => $taskData['id'] ?? null],
+                        array_merge($taskData, ['project_id' => $project->id])
+                    );
+                }
+            }
+        }
+        
         // Notify the supervisor about the update.
-        // Here we look up the supervisor by first name.
         $supervisor = User::where('first_name', $request->supervisor_name)->first();
         if ($supervisor) {
             $supervisor->notify(new ProjectUpdated($project));
         }
-
-        return redirect()->route('admin.dashboard')->with('success', 'Project updated successfully');
+        
+        if (Auth::user()->role === 'supervisor') {
+            return redirect()->route('supervisor.dashboard')->with('success', 'Project updates successfully');
+        } else {
+            return redirect()->route('admin.dashboard')->with('success', 'Project updated successfully');
+        }
     }
 
     // Delete a project
@@ -88,11 +103,14 @@ class ProjectController extends Controller
             'project_date'    => 'required|date',
             'due_date'        => 'required|date',
             'supervisor_name' => 'required|string|max:255',
+            'tasks' => 'nullable|string' // Store tasks as JSON in a hidden input field
         ]);
     
         // Ensure at least one task is added
-        if (!session('tasks') || count(session('tasks')) === 0) {
-            return redirect()->back()->with('error', 'At least one task is required');
+        $tasks = json_decode($request->tasks, true) ?? [];
+        
+        if (empty($tasks)) {
+            return redirect()->back()->with('error', 'At least one task is required.');
         }
     
         // Create the project
@@ -104,42 +122,52 @@ class ProjectController extends Controller
             'supervisor_name' => $request->supervisor_name,
         ]);
     
-        // Create tasks for the project
-        foreach (session('tasks') as $taskData) {
-            // Look up the user by name (assuming assigned_staff holds the user's first name)
-            $user = User::where('first_name', $taskData['assigned_staff'])->first();
-            
-            
+        // Array to map temporary task names to their actual IDs
+        $taskIdMapping = [];
+
+        foreach ($tasks as $task) {
+            // Find user by first name, fallback to null if not found
+            $user = User::where('first_name', $task['assigned_staff'])->first();
+
+            // Get the actual parent ID if available
+            $parentId = $task['parent_id'] ?? null;
+            if ($parentId && isset($taskIdMapping[$parentId])) {
+                $parentId = $taskIdMapping[$parentId];
+            } else {
+                $parentId = null;
+            }
+    
+            // Ensure a valid user exists before proceeding
             if ($user) {
-                // Create the task and store the actual email in the assigned_staff column
-                $task = Task::create([
-                    'project_id'       => $project->id,
-                    'task_name'        => $taskData['task_name'],
-                    'task_description' => $taskData['task_description'],
-                    'assigned_staff'   => $user->email, // Store user's email
-                    'assigned_date'    => $taskData['assigned_date'],
-                    'due_date'         => $taskData['due_date'],
-                    'parent_id'        => $taskData['parent_id'] ?? null,
+                $newTask = Task::create([  // Store the created Task instance
+                    'project_id'      => $project->id,
+                    'task_name'       => $task['task_name'],
+                    'task_description'=> $task['task_description'],
+                    'assigned_staff'  => $user->email, // Store user's email instead of name
+                    'assigned_date'   => $task['assigned_date'],
+                    'due_date'        => $task['due_date'],
+                    'parent_id'       => $parentId, // Optional parent_id for subtasks
                 ]);
-                
+
+                // Store task ID for referencing parent_id
+                $taskIdMapping[$task['task_name']] = $newTask->id;
+
                 // Notify the user via email
-                $user->notify(new TaskAssigned($task));
+                $user->notify(new TaskAssigned($newTask));
+
             } else {
                 // Optionally, create the task without notification if user not found.
                 Task::create([
                     'project_id'       => $project->id,
-                    'task_name'        => $taskData['task_name'],
-                    'task_description' => $taskData['task_description'],
-                    'assigned_staff'   => $taskData['assigned_staff'], // Fallback, though ideally this shouldn't happen.
-                    'assigned_date'    => $taskData['assigned_date'],
-                    'due_date'         => $taskData['due_date'],
-                    'parent_id'        => $taskData['parent_id'] ?? null,
+                    'task_name'        => $task['task_name'],
+                    'task_description' => $task['task_description'],
+                    'assigned_staff'   => $task['assigned_staff'], // Fallback, though ideally this shouldn't happen.
+                    'assigned_date'    => $task['assigned_date'],
+                    'due_date'         => $task['due_date'],
+                    'parent_id'        => $parentId, // Optional parent_id for subtasks
                 ]);
             }
         }
-    
-        // Clear tasks from session
-        session()->forget('tasks');
     
         // Look up the supervisor by first name (from supervisor_name field)
         $supervisor = User::where('first_name', $request->supervisor_name)->first();
@@ -147,12 +175,11 @@ class ProjectController extends Controller
             // Notify the supervisor about the new project
             $supervisor->notify(new ProjectCreated($project));
         }
+
         if (Auth::user()->role === 'supervisor') {
             return redirect()->route('supervisor.dashboard')->with('success', 'Project created successfully');
         } else {
             return redirect()->route('admin.dashboard')->with('success', 'Project created successfully');
         }
-        
-    
     }
 }

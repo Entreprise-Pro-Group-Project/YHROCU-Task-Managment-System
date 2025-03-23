@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\User;
+use App\Notifications\TaskAssigned;
+use App\Notifications\TaskUpdated;
+use App\Notifications\TaskDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User; 
@@ -55,10 +59,10 @@ public function updateDueDate(Request $request, Task $task)
 
 
 
-    // Update a task
+    // Update a task and notify the assigned user
     public function update(Request $request, Task $task)
     {
-        // Check if the request is only updating the status (and optionally comment)
+        // Check if the request is only updating status (and optionally comment)
         if ($request->has('status') && !$request->hasAny(['task_name', 'assigned_staff', 'due_date', 'parent_id'])) {
             $request->validate([
                 'status'  => 'required|string|in:assigned,in progress,completed,over due',
@@ -68,7 +72,7 @@ public function updateDueDate(Request $request, Task $task)
             $status = $request->input('status');
             $comment = $request->input('comment', $task->comment);
 
-            // If the due date has passed and the status is not 'completed', force status to 'overdue'
+            // If due date has passed and status is not completed, force status to 'overdue'
             if (\Carbon\Carbon::parse($task->due_date) < now() && $status !== 'completed') {
                 $status = 'overdue';
             }
@@ -78,29 +82,47 @@ public function updateDueDate(Request $request, Task $task)
                 'comment' => $comment,
             ]);
 
+            // Notify assigned user about the update
+            $user = User::where('first_name', $task->assigned_staff)->first();
+            if ($user) {
+                $user->notify(new TaskUpdated($task));
+            }
+
             return redirect()->back()->with('success', 'Task updated successfully');
         }
 
-        // Otherwise, process the full update (including comment)
+        // Process the full update (including comment)
         $validated = $request->validate([
-            'task_name'      => 'required|string|max:255',
-            'task_description' => 'required|string',
-            'assigned_staff' => 'required|string|max:255',
-            'assigned_date'  => 'required|date',
-            'due_date'       => 'required|date',
-            'parent_id'      => 'nullable|exists:tasks,id',
-            'comment'        => 'nullable|string',
+            'task_name'         => 'required|string|max:255',
+            'task_description'  => 'required|string',
+            'assigned_staff'    => 'required|string|max:255',
+            'assigned_date'     => 'required|date',
+            'due_date'          => 'required|date',
+            'parent_id'         => 'nullable|exists:tasks,id',
+            'comment'           => 'nullable|string',
         ]);
 
         $task->update($validated);
 
+        // Notify assigned user about the update
+        $user = User::where('first_name', $task->assigned_staff)->first();
+        if ($user) {
+            $user->notify(new TaskUpdated($task));
+        }
+
         return redirect()->route('admin.dashboard')->with('success', 'Task updated successfully');
     }
 
-    // Delete a task
+    // Delete a task and notify the assigned user
     public function destroy(Task $task)
     {
+        // Look up the user by the email stored in assigned_staff before deletion
+        $user = User::where('first_name', $task->assigned_staff)->first();
+        if ($user) {
+            $user->notify(new TaskDeleted($task));
+        }
         $task->delete();
+
         return redirect()->route('admin.dashboard')->with('success', 'Task deleted successfully');
     }
 
@@ -113,6 +135,7 @@ public function updateDueDate(Request $request, Task $task)
         return view('tasks.create');
     }
 
+<<<<<<< Updated upstream
     // Reassign a task to a different staff member
 
     public function reassign(Request $request, Task $task)
@@ -132,19 +155,28 @@ public function updateDueDate(Request $request, Task $task)
 
 
     // Store a new task in the database
+=======
+    // Store a new task in the session
+>>>>>>> Stashed changes
     public function store(Request $request)
     {
         $request->validate([
-            'task_name'      => 'required|string|max:255',
-            'task_description' => 'required|string',
-            'assigned_staff' => 'required|string|max:255',
-            'assigned_date'  => 'required|date',
-            'due_date'       => 'required|date',
-            'parent_id'      => 'nullable|exists:tasks,id',
+            'task_name'         => 'required|string|max:255',
+            'task_description'  => 'required|string',
+            'assigned_staff'    => 'required|string|max:255',
+            'assigned_date'     => 'required|date',
+            'due_date'          => 'required|date',
+            'parent_id'         => 'nullable|exists:tasks,id',
         ]);
 
+<<<<<<< Updated upstream
         // Store the task in the session
         $task = Task::create([
+=======
+        // Store the task in the session (temporary storage)
+        $task = [
+            'id'               => uniqid(), // Temporary ID for session
+>>>>>>> Stashed changes
             'task_name'        => $request->task_name,
             'task_description' => $request->task_description,
             'assigned_staff'   => $request->assigned_staff,

@@ -2,7 +2,6 @@
 
 namespace App\Notifications;
 
-use App\Models\Project;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -12,57 +11,41 @@ class ProjectDeleted extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $project;
+    public $projectId;
+    public $projectName;
 
     /**
      * Create a new notification instance.
      *
-     * @param \App\Models\Project $project
-     * @return void
+     * @param int $projectId
+     * @param string $projectName
      */
-    public function __construct(Project $project)
+    public function __construct(int $projectId, string $projectName)
     {
-        $this->project = $project;
+        $this->projectId   = $projectId;
+        $this->projectName = $projectName;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
     public function via($notifiable)
     {
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
-     */
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Project Deleted: ' . $this->project->project_name)
-            ->markdown('emails.project-deleted', [
-                'project' => $this->project,
-                'notifiable' => $notifiable,
-            ]);
+            ->subject('Project Deleted: ' . $this->projectName)
+            ->line('The project "' . $this->projectName . '" has been deleted.')
+            ->line('Project ID: ' . $this->projectId)
+            ->action('View Projects', url('/projects'))
+            ->line('Thank you for using our application!');
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
     public function toArray($notifiable)
     {
         return [
-            'project_id'   => $this->project->id,
-            'project_name' => $this->project->project_name,
+            'project_id'   => $this->projectId,
+            'project_name' => $this->projectName,
         ];
     }
 }

@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\User;
-use App\Notifications\TaskAssigned;
 use App\Notifications\TaskUpdated;
 use App\Notifications\TaskDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User; 
 
 
 class TaskController extends Controller
@@ -135,7 +133,6 @@ public function updateDueDate(Request $request, Task $task)
         return view('tasks.create');
     }
 
-<<<<<<< Updated upstream
     // Reassign a task to a different staff member
 
     public function reassign(Request $request, Task $task)
@@ -155,9 +152,6 @@ public function updateDueDate(Request $request, Task $task)
 
 
     // Store a new task in the database
-=======
-    // Store a new task in the session
->>>>>>> Stashed changes
     public function store(Request $request)
     {
         $request->validate([
@@ -169,14 +163,8 @@ public function updateDueDate(Request $request, Task $task)
             'parent_id'         => 'nullable|exists:tasks,id',
         ]);
 
-<<<<<<< Updated upstream
         // Store the task in the session
         $task = Task::create([
-=======
-        // Store the task in the session (temporary storage)
-        $task = [
-            'id'               => uniqid(), // Temporary ID for session
->>>>>>> Stashed changes
             'task_name'        => $request->task_name,
             'task_description' => $request->task_description,
             'assigned_staff'   => $request->assigned_staff,

@@ -51,7 +51,6 @@ class ProjectController extends Controller
             'supervisor_name'     => $request->supervisor_name,
         ]);
 
-<<<<<<< Updated upstream
         // Array to map temporary task names to their actual IDs
         $taskIdMapping = [];
 
@@ -96,8 +95,6 @@ class ProjectController extends Controller
         }
         
         // Notify the supervisor about the update.
-=======
->>>>>>> Stashed changes
         $supervisor = User::where('first_name', $request->supervisor_name)->first();
         if ($supervisor) {
             // Send immediate notification (no delay) about the update
@@ -138,7 +135,6 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-<<<<<<< Updated upstream
             'project_name'    => 'required|string|max:255',
             'project_description' => 'required|string',
             'project_date'    => 'required|date',
@@ -152,17 +148,6 @@ class ProjectController extends Controller
         
         if (empty($tasks)) {
             return redirect()->back()->with('error', 'At least one task is required.');
-=======
-            'project_name'       => 'required|string|max:255',
-            'project_description'=> 'required|string',
-            'project_date'       => 'required|date',
-            'due_date'           => 'required|date',
-            'supervisor_name'    => 'required|string|max:255',
-        ]);
-    
-        if (!session('tasks') || count(session('tasks')) === 0) {
-            return redirect()->back()->with('error', 'At least one task is required');
->>>>>>> Stashed changes
         }
     
         // Create the project
@@ -174,7 +159,6 @@ class ProjectController extends Controller
             'supervisor_name'    => $request->supervisor_name,
         ]);
     
-<<<<<<< Updated upstream
         // Array to map temporary task names to their actual IDs
         $taskIdMapping = [];
 
@@ -208,61 +192,24 @@ class ProjectController extends Controller
                 // Notify the user via email
                 $user->notify(new TaskAssigned($newTask));
 
-=======
-        // Delay for supervisor notification = project start date
-        $supervisorDelay = Carbon::parse($project->project_date)->startOfDay();
-    
-        // Create tasks
-        foreach (session('tasks') as $taskData) {
-            $user = User::where('first_name', $taskData['assigned_staff'])->first();
-            
-            if ($user) {
-                $task = Task::create([
-                    'project_id'       => $project->id,
-                    'task_name'        => $taskData['task_name'],
-                    'task_description' => $taskData['task_description'],
-                    'assigned_staff'   => $user->email,
-                    'assigned_date'    => $taskData['assigned_date'],
-                    'due_date'         => $taskData['due_date'],
-                    'parent_id'        => $taskData['parent_id'] ?? null,
-                ]);
-                
-                $taskDelay = Carbon::parse($taskData['assigned_date'])->startOfDay();
-                // Schedule the assigned user notification
-                $user->notify((new TaskAssigned($task))->delay($taskDelay));
->>>>>>> Stashed changes
             } else {
                 Task::create([
                     'project_id'       => $project->id,
-<<<<<<< Updated upstream
                     'task_name'        => $task['task_name'],
                     'task_description' => $task['task_description'],
                     'assigned_staff'   => $task['assigned_staff'], // Fallback, though ideally this shouldn't happen.
                     'assigned_date'    => $task['assigned_date'],
                     'due_date'         => $task['due_date'],
                     'parent_id'        => $parentId, // Optional parent_id for subtasks
-=======
-                    'task_name'        => $taskData['task_name'],
-                    'task_description' => $taskData['task_description'],
-                    'assigned_staff'   => $taskData['assigned_staff'],
-                    'assigned_date'    => $taskData['assigned_date'],
-                    'due_date'         => $taskData['due_date'],
-                    'parent_id'        => $taskData['parent_id'] ?? null,
->>>>>>> Stashed changes
                 ]);
             }
         }
-    
-<<<<<<< Updated upstream
+
         // Look up the supervisor by first name (from supervisor_name field)
-=======
-        session()->forget('tasks');
-    
-        // Look up the supervisor and schedule the ProjectCreated notification
->>>>>>> Stashed changes
         $supervisor = User::where('first_name', $request->supervisor_name)->first();
         if ($supervisor) {
-            $supervisor->notify((new ProjectCreated($project))->delay($supervisorDelay));
+            // Notify the supervisor about the new project
+            $supervisor->notify(new ProjectCreated($project));
         }
 
         if (Auth::user()->role === 'supervisor') {

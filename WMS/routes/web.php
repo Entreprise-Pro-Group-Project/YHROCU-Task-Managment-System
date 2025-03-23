@@ -36,6 +36,11 @@ Route::get('/reset-password/{token}', [PasswordResetLinkController::class, 'edit
 Route::post('/reset-password', [PasswordResetLinkController::class, 'update'])
     ->name('password.update');
 
+
+    Route::get('/users/search', [UserController::class, 'search'])->name('admin.user_management.search');
+    
+
+
 // Protected routes that require authentication
 Route::middleware('auth')->group(function () {
     // Admin dashboard
@@ -54,6 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.user_management.update');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.user_management.destroy');
     Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.user_management.reset-password');
+
     
     // Projects Routes
     Route::get('projects/create', [ProjectController::class, 'create'])->name('projects.create');

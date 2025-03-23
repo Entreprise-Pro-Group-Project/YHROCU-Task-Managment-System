@@ -34,11 +34,15 @@
                     <li class="task-item border p-2 rounded mb-2">
                         <input type="hidden" name="tasks[{{ $loop->index }}][id]" value="{{ $task->id }}">
                         <strong>{{ $task->task_name }}</strong> ({{ $task->assigned_staff }})
+                        @if($task->parent_id)
+                            <br><small>Parent Task: {{ optional($task->parent)->task_name }}</small>
+                        @endif
                         <input type="hidden" name="tasks[{{ $loop->index }}][task_name]" value="{{ $task->task_name }}">
                         <input type="hidden" name="tasks[{{ $loop->index }}][task_description]" value="{{ $task->task_description }}">
                         <input type="hidden" name="tasks[{{ $loop->index }}][assigned_staff]" value="{{ $task->assigned_staff }}">
                         <input type="hidden" name="tasks[{{ $loop->index }}][assigned_date]" value="{{ $task->assigned_date }}">
                         <input type="hidden" name="tasks[{{ $loop->index }}][due_date]" value="{{ $task->due_date }}">
+                        <input type="hidden" name="tasks[{{ $loop->index }}][parent_id]" value="{{ $task->parent_id }}">
                     </li>
                 @endforeach
             </ul>
@@ -59,21 +63,37 @@
     </div>
 
     {{-- Task Modal --}}
-    <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
-        <div class="bg-white p-6 rounded-lg w-1/3">
-            <h2 class="text-xl font-bold mb-4">Add Task</h2>
-            <label>Task Name</label>
-            <input type="text" id="task_name" class="w-full border rounded p-2 mb-2">
-            <label>Task Description</label>
-            <textarea id="task_description" class="w-full border rounded p-2 mb-2"></textarea>
-            <label>Assigned Staff</label>
-            <input type="text" id="assigned_staff" class="w-full border rounded p-2 mb-2">
-            <label>Assigned Date</label>
-            <input type="date" id="assigned_date" class="w-full border rounded p-2 mb-2">
-            <label>Due Date</label>
-            <input type="date" id="due_date" class="w-full border rounded p-2 mb-2">
-            <button onclick="addTask()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Add Task</button>
-            <button onclick="closeTaskModal()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Cancel</button>
+    <div id="taskModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+            <h2 class="text-lg font-bold mb-3">Add Task</h2>
+            
+            <label class="block text-sm font-medium text-gray-700">Task Name</label>
+            <input type="text" id="task_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            
+            <label class="block text-sm font-medium text-gray-700">Task Description</label>
+            <textarea id="task_description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+        
+            <label class="block text-sm font-medium text-gray-700">Assigned Staff</label>
+            <input type="text" id="assigned_staff" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        
+            <label class="block text-sm font-medium text-gray-700">Assigned Date</label>
+            <input type="date" id="assigned_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        
+            <label class="block text-sm font-medium text-gray-700">Due Date</label>
+            <input type="date" id="due_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        
+            <label class="block text-sm font-medium text-gray-700">Parent Task (Optional)</label>
+            <select id="parent_task" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">None</option>
+                @foreach($project->tasks as $task)
+                    <option value="{{ $task->id }}">{{ $task->task_name }}</option>
+                @endforeach
+            </select>
+
+            <div class="flex justify-end space-x-2 mt-3">
+                <button onclick="addTask()" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Add Task</button>
+                <button onclick="closeTaskModal()" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 text-sm">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -93,22 +113,25 @@
             let assignedStaff = document.getElementById('assigned_staff').value;
             let assignedDate = document.getElementById('assigned_date').value;
             let dueDate = document.getElementById('due_date').value;
-
+            let parentTask = document.getElementById('parent_task').value; // Get parent task ID
+             
             if (taskName && assignedStaff) {
                 let taskList = document.getElementById('task-list');
                 let taskIndex = taskList.children.length;
-
+                
                 let taskItem = `
                     <li class="task-item border p-2 rounded mb-2">
                         <strong>${taskName}</strong> (${assignedStaff})
+                        ${parentTask ? `<br><small>Parent Task: ${parentTask}</small>` : ""}
                         <input type="hidden" name="tasks[${taskIndex}][task_name]" value="${taskName}">
                         <input type="hidden" name="tasks[${taskIndex}][task_description]" value="${taskDesc}">
                         <input type="hidden" name="tasks[${taskIndex}][assigned_staff]" value="${assignedStaff}">
                         <input type="hidden" name="tasks[${taskIndex}][assigned_date]" value="${assignedDate}">
                         <input type="hidden" name="tasks[${taskIndex}][due_date]" value="${dueDate}">
+                        <input type="hidden" name="tasks[${taskIndex}][parent_id]" value="${parentTask}">
                     </li>
                 `;
-
+                
                 taskList.innerHTML += taskItem;
                 closeTaskModal();
             } else {

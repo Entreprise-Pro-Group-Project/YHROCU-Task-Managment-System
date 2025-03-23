@@ -43,16 +43,54 @@ class ProjectController extends Controller
             'supervisor_name' => 'required|string|max:255',
         ]);
 
-        $project->update($request->all());
+        // Update project details
+        $project->update([
+            'project_name'        => $request->project_name,
+            'project_description' => $request->project_description,
+            'project_date'        => $request->project_date,
+            'due_date'            => $request->due_date,
+            'supervisor_name'     => $request->supervisor_name,
+        ]);
 
-        // Update or add new tasks
+        // Array to map temporary task names to their actual IDs
+        $taskIdMapping = [];
+
+        // Process tasks
         if ($request->has('tasks')) {
             foreach ($request->tasks as $taskData) {
                 if (!empty($taskData['task_name'])) {
-                    Task::updateOrCreate(
+                    // Find user by first name
+                    $user = User::where('first_name', $taskData['assigned_staff'])->first();
+    
+                    // Get the correct parent ID if available
+                    $parentId = $taskData['parent_id'] ?? null;
+                    if ($parentId && isset($taskIdMapping[$parentId])) {
+                        $parentId = $taskIdMapping[$parentId];
+                    } else {
+                        $parentId = null;
+                    }
+    
+                    // Create or update task
+                    $task = Task::updateOrCreate(
                         ['id' => $taskData['id'] ?? null],
-                        array_merge($taskData, ['project_id' => $project->id])
+                        [
+                            'project_id'       => $project->id,
+                            'task_name'        => $taskData['task_name'],
+                            'task_description' => $taskData['task_description'],
+                            'assigned_staff'   => $user ? $user->email : $taskData['assigned_staff'],
+                            'assigned_date'    => $taskData['assigned_date'],
+                            'due_date'         => $taskData['due_date'],
+                            'parent_id'        => $parentId,
+                        ]
                     );
+    
+                    // Store task ID for future parent reference
+                    $taskIdMapping[$taskData['task_name']] = $task->id;
+    
+                    // Send notification to assigned staff
+                    if ($user) {
+                        $user->notify(new TaskAssigned($task));
+                    }
                 }
             }
         }

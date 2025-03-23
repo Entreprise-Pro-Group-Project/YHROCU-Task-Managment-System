@@ -176,7 +176,15 @@
                                                 <div>
                                                     <h4 class="font-medium">{{ $task->task_name }}</h4>
                                                     <div class="mt-1 text-sm text-gray-600">
-                                                        <div>Assigned to: <span class="font-medium">{{ $task->assigned_staff }}</span></div>
+                                                        @if ($task->parent_id)
+                                                        <div>Parent Task: 
+                                                            <span class="font-medium">
+                                                                {{ optional($task->parent)->task_name }}
+                                                            </span>
+                                                        </div>
+                                                        @endif
+                                                        <div>Staff: <span class="font-medium">{{ $task->assigned_staff }}</span></div>
+                                                        <div>Assigned: <span class="font-medium">{{ \Carbon\Carbon::parse($task->assigned_date)->format('M d, Y') }}</span></div>
                                                         <div>Due: <span class="font-medium">{{ \Carbon\Carbon::parse($task->due_date)->format('M d, Y') }}</span></div>
                                                     </div>
                                                 </div>

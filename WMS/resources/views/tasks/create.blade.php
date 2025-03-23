@@ -46,11 +46,9 @@
                 <label for="parent_id" class="block text-sm font-medium text-gray-700">Parent Task (Optional)</label>
                 <select name="parent_id" id="parent_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     <option value="">None</option>
-                    @if (session('tasks'))
-                        @foreach (session('tasks') as $task)
-                            <option value="{{ $task['id'] }}">{{ $task['task_name'] }}</option>
-                        @endforeach
-                    @endif
+                    @foreach (\App\Models\Task::all() as $task)
+                        <option value="{{ $task->id }}">{{ $task->task_name }}</option>
+                    @endforeach
                 </select>
             </div>
 

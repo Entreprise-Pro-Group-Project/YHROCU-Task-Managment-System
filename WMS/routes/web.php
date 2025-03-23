@@ -16,52 +16,60 @@ use App\Http\Controllers\TaskCommentController;
 
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return auth()->check() 
+        ? redirect()->route('dashboard.redirect') 
+        : redirect()->route('login');
 });
 
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-// Password reset routes
+
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+    ->middleware('guest')
+    ->name('login');
+
+
+// Password Reset Routes
 Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
     ->name('password.request');
-
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
     ->name('password.email');
-
 Route::get('/reset-password/{token}', [PasswordResetLinkController::class, 'edit'])
     ->name('password.reset');
-
 Route::post('/reset-password', [PasswordResetLinkController::class, 'update'])
     ->name('password.update');
 
-
-    Route::get('/users/search', [UserController::class, 'search'])->name('admin.user_management.search');
-    
-
+// Public User Search Route (if applicable)
+Route::get('/users/search', [UserController::class, 'search'])->name('admin.user_management.search');
 
 // Protected routes that require authentication
 Route::middleware('auth')->group(function () {
-    // Admin dashboard
-    Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    
-    // Supervisor dashboard
-    Route::get('/supervisor/dashboard', [SupervisorController::class, 'dashboard'])->name('supervisor.dashboard');
-    
-    // Staff dashboard
-    Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
-    
-    // User management routes
-    Route::get('/users', [UserController::class, 'indexView'])->name('admin.user_management.index');
-    Route::post('/users', [UserController::class, 'store'])->name('admin.user_management.store');
-    Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.user_management.show');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.user_management.update');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.user_management.destroy');
-    Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.user_management.reset-password');
 
-    
-    // Projects Routes
+    // Admin-specific routes
+    Route::middleware(\App\Http\Middleware\RoleMiddleware::class . ':admin')->group(function () {
+        Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        
+        // User management for admin
+        Route::get('/users', [UserController::class, 'indexView'])->name('admin.user_management.index');
+        Route::post('/users', [UserController::class, 'store'])->name('admin.user_management.store');
+        Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.user_management.show');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.user_management.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.user_management.destroy');
+        Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.user_management.reset-password');
+    });
+
+    // Supervisor-specific routes
+    Route::middleware(\App\Http\Middleware\RoleMiddleware::class . ':supervisor')->group(function () {
+        Route::get('/supervisor/dashboard', [SupervisorController::class, 'dashboard'])->name('supervisor.dashboard');
+    });
+
+    // Staff-specific routes
+    Route::middleware(\App\Http\Middleware\RoleMiddleware::class . ':staff')->group(function () {
+        Route::get('/staff/dashboard', [StaffController::class, 'dashboard'])->name('staff.dashboard');
+    });
+
+    // Routes accessible to all authenticated users
+
+    // Project Routes
     Route::get('projects/create', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('projects/store-data', [ProjectController::class, 'storeProjectData'])->name('projects.store-data');
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
@@ -69,39 +77,28 @@ Route::middleware('auth')->group(function () {
     Route::get('projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
-    
-    // Tasks Routes
+
+    // Task Routes
     Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
     Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::get('tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
     Route::get('tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
     Route::put('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+    Route::put('/tasks/{task}/reassign', [TaskController::class, 'reassign'])->name('tasks.reassign');
+    Route::put('/tasks/{task}/update-due-date', [TaskController::class, 'updateDueDate'])->name('tasks.update.due_date');
 
-    // task reassign route
+    // Task Comment Route
+    Route::post('/tasks/{task}/comment', [TaskCommentController::class, 'store'])
+        ->name('comment');
 
-Route::put('/tasks/{task}/reassign', [TaskController::class, 'reassign'])->name('tasks.reassign');
-
-// updating due date route
-
-
-Route::put('/tasks/{task}/update-due-date', [TaskController::class, 'updateDueDate'])->name('tasks.update.due_date');
-
-
-    // Task Comments Routes
-
-Route::post('/tasks/{task}/comment', [TaskCommentController::class, 'store'])
-    ->name('comment');
-
-
-
-    
-    // Dashboard redirect
+    // Dashboard Redirect
     Route::get('/dashboard-redirect', [DashboardController::class, 'redirect'])->name('dashboard.redirect');
-    
-    // Profile routes
+
+    // Profile Routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update-profile-information-form'])->name('profile.update-profile-information-form');
 });
 
+// Include additional auth routes if needed
 require __DIR__.'/auth.php';

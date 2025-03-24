@@ -182,7 +182,6 @@
                     Comments
                 </h2>
 
-                <!-- Existing Comments -->
                 
                 <!-- Existing Comments Section -->
 @if($task->comments->count() > 0)
@@ -196,9 +195,12 @@
             </div>
             <div class="flex-1 bg-gray-50 rounded-lg px-4 py-3">
                 <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-sm font-medium text-gray-900">
-                        {{ $comment->user->name ?? 'User' }}
-                    </h3>
+                <h3 class="text-sm font-medium text-gray-900">
+                {{ $comment->user->name ?? 'User' }} 
+                @if(isset($comment->user->role))
+                    ({{ ucfirst($comment->user->role) }})
+                @endif
+            </h3>
                     <p class="text-xs text-gray-500">
                         {{ \Carbon\Carbon::parse($comment->created_at)->format('M d, Y \a\t g:i A') }}
                     </p>

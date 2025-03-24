@@ -20,7 +20,7 @@
             </div>
             <div class="mb-4">
                 <label for="due_date" class="block text-sm font-medium text-gray-700">Due Date</label>
-                <input type="date" name="due_date" id="due_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ $project->due_date }}" required>
+                <input type="date" name="due_date" id="project_due_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ $project->due_date }}" required>
             </div>
             <div class="mb-4">
                 <label for="supervisor_name" class="block text-sm font-medium text-gray-700">Supervisor Name</label>
@@ -63,37 +63,28 @@
     </div>
 
     {{-- Task Modal --}}
-    <div id="taskModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
-            <h2 class="text-lg font-bold mb-3">Add Task</h2>
-            
-            <label class="block text-sm font-medium text-gray-700">Task Name</label>
-            <input type="text" id="task_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-            
-            <label class="block text-sm font-medium text-gray-700">Task Description</label>
-            <textarea id="task_description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
-        
-            <label class="block text-sm font-medium text-gray-700">Assigned Staff</label>
-            <input type="text" id="assigned_staff" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        
-            <label class="block text-sm font-medium text-gray-700">Assigned Date</label>
-            <input type="date" id="assigned_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        
-            <label class="block text-sm font-medium text-gray-700">Due Date</label>
-            <input type="date" id="due_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        
-            <label class="block text-sm font-medium text-gray-700">Parent Task (Optional)</label>
-            <select id="parent_task" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+    <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
+        <div class="bg-white p-6 rounded-lg w-1/3">
+            <h2 class="text-xl font-bold mb-4">Add Task</h2>
+            <label>Task Name</label>
+            <input type="text" id="task_name" class="w-full border rounded p-2 mb-2">
+            <label>Task Description</label>
+            <textarea id="task_description" class="w-full border rounded p-2 mb-2"></textarea>
+            <label>Assigned Staff</label>
+            <input type="text" id="assigned_staff" class="w-full border rounded p-2 mb-2">
+            <label>Assigned Date</label>
+            <input type="date" id="assigned_date" class="w-full border rounded p-2 mb-2">
+            <label>Due Date</label>
+            <input type="date" id="due_date" class="w-full border rounded p-2 mb-2">
+            <label>Parent Task (Optional)</label>
+            <select id="parent_task" class="w-full border rounded p-2 mb-2">
                 <option value="">None</option>
                 @foreach($project->tasks as $task)
                     <option value="{{ $task->id }}">{{ $task->task_name }}</option>
                 @endforeach
             </select>
-
-            <div class="flex justify-end space-x-2 mt-3">
-                <button onclick="addTask()" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm">Add Task</button>
-                <button onclick="closeTaskModal()" class="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 text-sm">Cancel</button>
-            </div>
+            <button onclick="addTask()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Add Task</button>
+            <button onclick="closeTaskModal()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Cancel</button>
         </div>
     </div>
 
@@ -114,7 +105,7 @@
             let assignedDate = document.getElementById('assigned_date').value;
             let dueDate = document.getElementById('due_date').value;
             let parentTask = document.getElementById('parent_task').value; // Get parent task ID
-             
+            
             if (taskName && assignedStaff) {
                 let taskList = document.getElementById('task-list');
                 let taskIndex = taskList.children.length;

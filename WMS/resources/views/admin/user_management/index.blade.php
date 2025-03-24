@@ -85,51 +85,48 @@
         <!-- Main Content -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <!-- Filters and Search -->
-            <!-- Filters and Search -->
             <form action="{{ route('admin.user_management.index') }}" method="GET">
-    <div class="p-6 border-b border-gray-200 bg-gray-50">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div class="flex-1 min-w-0">
-                <div class="relative rounded-md shadow-sm">
-                    <!-- Left search icon -->
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                        </svg>
+                <div class="p-6 border-b border-gray-200 bg-gray-50">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div class="flex-1 min-w-0">
+                            <div class="relative rounded-md shadow-sm">
+                                <!-- Left search icon -->
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <!-- Search input with extra right padding -->
+                                <input type="text" id="search" name="search" placeholder="Search users..." value="{{ request('search') }}"
+                                       class="focus:ring-[#0284c7] focus:border-[#0284c7] block w-full pl-10 pr-10 sm:text-sm border-gray-300 rounded-md">
+                                <!-- Submit button inside the search input container -->
+                                <button type="submit" class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                    <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div>
+                                <select id="role-filter" name="role" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#0284c7] focus:border-[#0284c7] sm:text-sm rounded-md">
+                                    <option value="">All Roles</option>
+                                    <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Supervisor</option>
+                                    <option value="staff" {{ request('role') === 'staff' ? 'selected' : '' }}>Staff</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select id="sort-by" name="sort" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#0284c7] focus:border-[#0284c7] sm:text-sm rounded-md">
+                                    <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Sort by Name</option>
+                                    <option value="role" {{ request('sort') === 'role' ? 'selected' : '' }}>Sort by Role</option>
+                                    <option value="created" {{ request('sort') === 'created' ? 'selected' : '' }}>Sort by Created Date</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <!-- Search input with extra right padding -->
-                    <input type="text" id="search" name="search" placeholder="Search users..." value="{{ request('search') }}"
-                           class="focus:ring-[#0284c7] focus:border-[#0284c7] block w-full pl-10 pr-10 sm:text-sm border-gray-300 rounded-md">
-                    <!-- Submit button inside the search input container -->
-                    <button type="submit" class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
                 </div>
-            </div>
-            <div class="flex items-center space-x-3">
-                <div>
-                    <select id="role-filter" name="role" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#0284c7] focus:border-[#0284c7] sm:text-sm rounded-md">
-                        <option value="">All Roles</option>
-                        <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Supervisor</option>
-                        <option value="staff" {{ request('role') === 'staff' ? 'selected' : '' }}>Staff</option>
-                    </select>
-                </div>
-                <div>
-                    <select id="sort-by" name="sort" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#0284c7] focus:border-[#0284c7] sm:text-sm rounded-md">
-                        <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Sort by Name</option>
-                        <option value="role" {{ request('sort') === 'role' ? 'selected' : '' }}>Sort by Role</option>
-                        <option value="created" {{ request('sort') === 'created' ? 'selected' : '' }}>Sort by Created Date</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-</form>
-
-
+            </form>
 
             <!-- Users Table -->
             <div class="overflow-x-auto">
@@ -343,32 +340,32 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-                        <input type="text" name="first_name" id="first_name" class="mt-1 focus:ring-[#0284c7] focus:border-[#0284c7] block w-full shadow-sm sm:text-sm border-gray-300 rounded-md @error('first_name')  @enderror" value="{{ old('first_name') }}" required>
+                        <input type="text" name="first_name" id="first_name" class="mt-1 focus:ring-[#0284c7] focus:border-[#0284c7] block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="{{ old('first_name') }}" required>
                     </div>
                     <div>
                         <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-                        <input type="text" name="last_name" id="last_name" class="mt-1 focus:ring-[#0284c7] focus:border-[#0284c7] block w-full shadow-sm sm:text-sm border-gray-300 rounded-md @error('last_name')  @enderror" value="{{ old('last_name') }}" required>
+                        <input type="text" name="last_name" id="last_name" class="mt-1 focus:ring-[#0284c7] focus:border-[#0284c7] block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="{{ old('last_name') }}" required>
                     </div>
                 </div>
                 
                 <div>
                     <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                    <input type="text" name="username" id="username" class="mt-1 focus:ring-[#0284c7] focus:border-[#0284c7] block w-full shadow-sm sm:text-sm border-gray-300 rounded-md @error('username')  @enderror" value="{{ old('username') }}" required>
+                    <input type="text" name="username" id="username" class="mt-1 focus:ring-[#0284c7] focus:border-[#0284c7] block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="{{ old('username') }}" required>
                 </div>
                 
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="email" id="email" class="mt-1 focus:ring-[#0284c7] border-gray-300  @error('  focus:border-[#0284c7] block w-full shadow-sm sm:text-sm  rounded-md @error('email')  @enderror" value="{{ old('email') }}" required>
+                    <input type="email" name="email" id="email" class="mt-1 focus:ring-[#0284c7] border-gray-300 focus:border-[#0284c7] block w-full shadow-sm sm:text-sm rounded-md" value="{{ old('email') }}" required>
                 </div>
                 
                 <div>
                     <label for="phone_number" class="block text-sm font-medium text-gray-700">Phone Number</label>
-                    <input type="text" name="phone_number" id="phone_number" class="mt-1 focus:ring-[#0284c7] focus:border-[#0284c7] block w-full shadow-sm sm:text-sm border-gray-300 rounded-md @error('phone_number')  @enderror" value="{{ old('phone_number') }}">
+                    <input type="text" name="phone_number" id="phone_number" class="mt-1 focus:ring-[#0284c7] focus:border-[#0284c7] block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" value="{{ old('phone_number') }}">
                 </div>
                 
                 <div>
                     <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
-                    <select name="role" id="role" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#0284c7] focus:border-[#0284c7] sm:text-sm rounded-md @error('role')  @enderror" required>
+                    <select name="role" id="role" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#0284c7] focus:border-[#0284c7] sm:text-sm rounded-md" required>
                         <option value="">Select a role</option>
                         <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="supervisor" {{ old('role') == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
@@ -379,7 +376,7 @@
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                     <div class="mt-1 relative rounded-md shadow-sm">
-                        <input type="password" name="password" id="password" class="focus:ring-[#0284c7] focus:border-[#0284c7] block w-full pr-10 sm:text-sm border-gray-300 rounded-md @error('password')  @enderror" required>
+                        <input type="password" name="password" id="password" class="focus:ring-[#0284c7] focus:border-[#0284c7] block w-full pr-10 sm:text-sm border-gray-300 rounded-md" required>
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
                             <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -424,7 +421,6 @@
 
 <!-- View User Modal (will be created dynamically) -->
 <!-- Edit User Modal (will be created dynamically) -->
-
 <script>
     function toggleModal(modalId) {
         const modal = document.getElementById(modalId);
@@ -545,8 +541,8 @@
                                 
                                 <div class="mt-4">
                                     <form id="editUserForm" method="POST" class="space-y-4">
-                                        @csrf
-                                        @method('PUT')
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="_method" value="PUT">
                                         
                                         <div class="grid grid-cols-2 gap-4">
                                             <div>
@@ -652,23 +648,21 @@
         }
     });
 
-
     document.addEventListener('DOMContentLoaded', function() {
-    const roleSelect = document.getElementById('role-filter');
-    const sortSelect = document.getElementById('sort-by');
+        const roleSelect = document.getElementById('role-filter');
+        const sortSelect = document.getElementById('sort-by');
 
-    if (roleSelect) {
-        roleSelect.addEventListener('change', function() {
-            this.form.submit();
-        });
-    }
-    if (sortSelect) {
-        sortSelect.addEventListener('change', function() {
-            this.form.submit();
-        });
-    }
-});
-
+        if (roleSelect) {
+            roleSelect.addEventListener('change', function() {
+                this.form.submit();
+            });
+        }
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                this.form.submit();
+            });
+        }
+    });
 </script>
 
 <style>
@@ -694,4 +688,4 @@
         animation: fadeIn 0.5s ease-in-out forwards;
     }
 </style>
-@endsection    
+@endsection

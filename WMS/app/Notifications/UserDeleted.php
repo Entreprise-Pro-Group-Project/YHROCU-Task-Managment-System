@@ -12,7 +12,7 @@ class UserDeleted extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public $user;
+    public $userData;
 
     /**
      * Create a new notification instance.
@@ -22,7 +22,14 @@ class UserDeleted extends Notification implements ShouldQueue
      */
     public function __construct(User $user)
     {
-        $this->user = $user;
+        // Store only the data we need instead of the User model instance
+        $this->userData = [
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'username' => $user->username,
+            'email' => $user->email
+        ];
     }
 
     /**
@@ -47,7 +54,7 @@ class UserDeleted extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Your Account Has Been Removed')
             ->markdown('emails.user-deleted', [
-                'user' => $this->user
+                'user' => (object)$this->userData
             ]);
     }
 
@@ -60,9 +67,9 @@ class UserDeleted extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'user_id' => $this->user->id,
-            'username' => $this->user->username,
-            'email' => $this->user->email
+            'user_id' => $this->userData['id'],
+            'username' => $this->userData['username'],
+            'email' => $this->userData['email']
         ];
     }
 }

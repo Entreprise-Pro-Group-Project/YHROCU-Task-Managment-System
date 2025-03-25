@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Notifications\UserCreated;
 use App\Notifications\UserUpdated;
 use App\Notifications\UserDeleted;
+use Illuminate\Support\Facades\Notification;
 
 class UserController extends Controller
 {
@@ -161,11 +162,10 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            $tempUser = clone $user;
             
-            \Illuminate\Support\Facades\Notification::route('mail', [
-                $user->email => $user->first_name . ' ' . $user->last_name
-            ])->notify(new UserDeleted($tempUser));
+            // Create a direct notification instance with user data before deleting
+            Notification::route('mail', $user->email)
+                ->notify(new UserDeleted($user));
             
             Log::info('User deletion notification queued', ['user_id' => $user->id, 'email' => $user->email]);
             

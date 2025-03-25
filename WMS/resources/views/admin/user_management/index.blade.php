@@ -1,5 +1,10 @@
 @extends('layouts.app')
 
+@section('header')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Additional header content -->
+@endsection
+
 @section('title', 'User Management')
 
 @section('content')
@@ -16,7 +21,7 @@
                         Manage system users, roles and permissions
                     </p>
                 </div>
-                <div class="mt-4 md:mt-0 flex space-x-3">
+                <div class="mt-4 md:mt-0 flex justify-end">
                     <button 
                         type="button" 
                         onclick="toggleModal('addUserModal')" 
@@ -27,15 +32,6 @@
                             <path d="M16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
                         </svg>
                         Add New User
-                    </button>
-                    <button 
-                        type="button" 
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0284c7] transition-colors duration-200"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-                        </svg>
-                        Password Reset
                     </button>
                 </div>
             </div>
@@ -205,15 +201,16 @@
                                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                                             </svg>
                                         </button>
-                                        <form action="{{ route('admin.user_management.destroy', $user->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-gray-500 hover:text-red-600 transition-colors duration-150" onclick="return confirm('Are you sure you want to delete this user?')">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                                                </svg>
-                                            </button>
-                                        </form>
+                                        <button onclick="resetUserPassword('{{ $user->id }}', '{{ $user->first_name }} {{ $user->last_name }}', '{{ $user->username }}', '{{ $user->email }}')" class="text-gray-500 hover:text-[#0284c7] transition-colors duration-150">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <button onclick="confirmDelete('{{ $user->id }}', '{{ $user->first_name }} {{ $user->last_name }}')" class="text-gray-500 hover:text-red-500 transition-colors duration-150">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -663,6 +660,314 @@
             });
         }
     });
+
+    function resetUserPassword(userId, userName, username, email) {
+        document.getElementById('reset-password-user-name').textContent = 'Reset password for ' + userName;
+        document.getElementById('reset-username').textContent = username;
+        document.getElementById('reset-email').textContent = email;
+        document.getElementById('resetPasswordForm').action = "{{ url('/users/') }}/" + userId + "/reset-password";
+        toggleModal('passwordResetModal');
+    }
+    
+    function confirmDelete(userId, userName) {
+        // Create a confirmation dialog if it doesn't exist
+        if (!document.getElementById('deleteConfirmModal')) {
+            const modalHtml = `
+                <div id="deleteConfirmModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+                    <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+                        <div class="flex justify-between items-center pb-3 border-b">
+                            <h3 class="text-xl font-semibold text-gray-900">Confirm Delete</h3>
+                            <button onclick="toggleModal('deleteConfirmModal')" class="text-gray-400 hover:text-gray-500">
+                                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-600 mb-4">Are you sure you want to delete this user? This action cannot be undone.</p>
+                            <div class="mb-6 bg-red-50 p-4 rounded-lg text-left border border-red-100">
+                                <p class="text-sm font-medium text-red-800" id="delete-user-name"></p>
+                            </div>
+                            
+                            <div class="flex items-center justify-end pt-4 border-t border-gray-200">
+                                <button type="button" onclick="toggleModal('deleteConfirmModal')" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0284c7] mr-3">
+                                    Cancel
+                                </button>
+                                <form id="deleteUserForm" method="POST" style="margin:0;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" id="confirmDeleteBtn" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                                        Delete User
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        // Set the user name and form action
+        document.getElementById('delete-user-name').textContent = userName;
+        document.getElementById('deleteUserForm').action = "{{ url('/users/') }}/" + userId;
+        
+        // Set up event listener for the delete form
+        const deleteForm = document.getElementById('deleteUserForm');
+        const deleteBtn = document.getElementById('confirmDeleteBtn');
+        
+        // Remove existing event listeners if any (to prevent duplicates)
+        const newDeleteForm = deleteForm.cloneNode(true);
+        deleteForm.parentNode.replaceChild(newDeleteForm, deleteForm);
+        
+        // Add event listener to the delete form
+        newDeleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Deleting...';
+            
+            // Submit form via AJAX
+            fetch(this.action, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Close the modal and reload the page on success
+                    toggleModal('deleteConfirmModal');
+                    window.location.reload();
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.message || 'Failed to delete user');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting user:', error);
+                alert('Failed to delete user: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Delete User';
+            });
+        });
+        
+        // Show the modal
+        toggleModal('deleteConfirmModal');
+    }
+    
+    // Check if we need to show the password reset modal (e.g., from an email link)
+    document.addEventListener('DOMContentLoaded', function() {
+        @if($resetUser)
+            resetUserPassword(
+                '{{ $resetUser->id }}', 
+                '{{ $resetUser->first_name }} {{ $resetUser->last_name }}',
+                '{{ $resetUser->username }}',
+                '{{ $resetUser->email }}'
+            );
+        @endif
+        
+        // Setup password reset form validation and submission
+        setupPasswordResetForm();
+        
+        // Setup password visibility toggles for reset form
+        const toggleResetPassword = document.getElementById('toggleResetPassword');
+        const resetPasswordInput = document.getElementById('reset_password');
+        const toggleResetConfirmPassword = document.getElementById('toggleResetConfirmPassword');
+        const resetConfirmPasswordInput = document.getElementById('reset_password_confirmation');
+        
+        if (toggleResetPassword && resetPasswordInput) {
+            toggleResetPassword.addEventListener('click', function() {
+                const type = resetPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                resetPasswordInput.setAttribute('type', type);
+                this.innerHTML = type === 'password' 
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>'
+                    : '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" /><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" /></svg>';
+            });
+        }
+        
+        if (toggleResetConfirmPassword && resetConfirmPasswordInput) {
+            toggleResetConfirmPassword.addEventListener('click', function() {
+                const type = resetConfirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                resetConfirmPasswordInput.setAttribute('type', type);
+                this.innerHTML = type === 'password' 
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>'
+                    : '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd" /><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" /></svg>';
+            });
+        }
+    });
+    
+    function setupPasswordResetForm() {
+        const resetForm = document.getElementById('resetPasswordForm');
+        const resetBtn = document.getElementById('resetPasswordSubmitBtn');
+        const errorsContainer = document.getElementById('passwordResetErrors');
+        const successContainer = document.getElementById('passwordResetSuccess');
+        const errorsList = document.getElementById('passwordResetErrorList');
+        
+        if (resetForm) {
+            resetForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Clear previous messages
+                errorsContainer.classList.add('hidden');
+                errorsList.innerHTML = '';
+                successContainer.classList.add('hidden');
+                
+                // Get form values
+                const password = document.getElementById('reset_password').value;
+                const passwordConfirmation = document.getElementById('reset_password_confirmation').value;
+                
+                // Validate password client-side
+                const errors = validatePassword(password, passwordConfirmation);
+                
+                if (errors.length > 0) {
+                    // Show validation errors
+                    errorsContainer.classList.remove('hidden');
+                    errors.forEach(error => {
+                        const li = document.createElement('li');
+                        li.textContent = error;
+                        errorsList.appendChild(li);
+                    });
+                    return;
+                }
+                
+                // Show loading state
+                resetBtn.disabled = true;
+                resetBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing...';
+                
+                // Submit form via AJAX
+                const formData = new FormData(resetForm);
+                
+                fetch(resetForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            console.error('Error response text:', text);
+                            try {
+                                return { error: JSON.parse(text) };
+                            } catch (e) {
+                                return { error: { message: 'An unknown error occurred' } };
+                            }
+                        });
+                    }
+                    return response.json().then(data => {
+                        console.log('Success response:', data);
+                        return { success: data };
+                    });
+                })
+                .then(result => {
+                    resetBtn.disabled = false;
+                    resetBtn.innerHTML = 'Reset Password';
+                    
+                    if (result.success) {
+                        // Show success message
+                        successContainer.classList.remove('hidden');
+                        document.getElementById('passwordResetSuccessMessage').textContent = 
+                            result.success.message || 'Password reset successfully. An email with the new password has been sent to the user.';
+                        
+                        // Reset the form
+                        resetForm.reset();
+                        
+                        // Close modal after 2 seconds
+                        setTimeout(() => {
+                            toggleModal('passwordResetModal');
+                        }, 2000);
+                    } else if (result.error) {
+                        // Show validation errors
+                        errorsContainer.classList.remove('hidden');
+                        
+                        if (result.error.errors) {
+                            // Laravel validation errors
+                            Object.values(result.error.errors).forEach(fieldErrors => {
+                                fieldErrors.forEach(message => {
+                                    const li = document.createElement('li');
+                                    li.textContent = message;
+                                    errorsList.appendChild(li);
+                                });
+                            });
+                        } else if (result.error.message) {
+                            // General error message
+                            const li = document.createElement('li');
+                            li.textContent = result.error.message;
+                            errorsList.appendChild(li);
+                        } else {
+                            // Unknown error format
+                            const li = document.createElement('li');
+                            li.textContent = 'An error occurred during password reset.';
+                            errorsList.appendChild(li);
+                        }
+                    }
+                })
+                .catch(error => {
+                    resetBtn.disabled = false;
+                    resetBtn.innerHTML = 'Reset Password';
+                    
+                    // Show generic error
+                    errorsContainer.classList.remove('hidden');
+                    const li = document.createElement('li');
+                    li.textContent = 'An error occurred. Please try again.';
+                    errorsList.appendChild(li);
+                    console.error('Password reset error:', error);
+                });
+            });
+        }
+    }
+    
+    function validatePassword(password, passwordConfirmation) {
+        const errors = [];
+        
+        // Check if password is empty
+        if (!password) {
+            errors.push('Password is required.');
+            return errors;
+        }
+        
+        // Check password length
+        if (password.length < 8) {
+            errors.push('Password must be at least 8 characters long.');
+        }
+        
+        // Check for uppercase letter
+        if (!/[A-Z]/.test(password)) {
+            errors.push('Password must contain at least one uppercase letter.');
+        }
+        
+        // Check for lowercase letter
+        if (!/[a-z]/.test(password)) {
+            errors.push('Password must contain at least one lowercase letter.');
+        }
+        
+        // Check for number
+        if (!/\d/.test(password)) {
+            errors.push('Password must contain at least one number.');
+        }
+        
+        // Check for special character
+        if (!/[@$!%*?&]/.test(password)) {
+            errors.push('Password must contain at least one special character (@$!%*?&).');
+        }
+        
+        // Check password confirmation
+        if (password !== passwordConfirmation) {
+            errors.push('Password confirmation does not match.');
+        }
+        
+        return errors;
+    }
 </script>
 
 <style>
@@ -676,6 +981,11 @@
         to { opacity: 0; }
     }
     
+    @keyframes appear {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
     .animate-fade-in {
         animation: fadeIn 0.2s ease-in-out forwards;
     }
@@ -684,8 +994,117 @@
         animation: fadeOut 0.2s ease-in-out forwards;
     }
     
+    .animate-appear {
+        animation: appear 0.3s ease-out forwards;
+    }
+    
     .animate-fade-in-down {
         animation: fadeIn 0.5s ease-in-out forwards;
     }
 </style>
+
+<!-- Password Reset Modal -->
+<div id="passwordResetModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center pb-3 border-b">
+            <h3 class="text-xl font-semibold text-gray-900">Reset Password</h3>
+            <button onclick="toggleModal('passwordResetModal')" class="text-gray-400 hover:text-gray-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <div class="mt-4">
+            <p class="text-sm text-gray-600 mb-4" id="reset-password-user-name">Reset password for Admin User</p>
+            <div class="mb-6 bg-gray-50 p-4 rounded-lg text-left border border-gray-200">
+                <p class="text-sm" id="reset-user-details">
+                    <span class="font-semibold">Username:</span> <span id="reset-username">Master Ahmed</span><br>
+                    <span class="font-semibold">Email:</span> <span id="reset-email">ahmedmelhambisk@gmail.com</span>
+                </p>
+            </div>
+            
+            <!-- Error messages container -->
+            <div id="passwordResetErrors" class="mb-4 hidden bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
+                        <ul class="mt-2 list-disc list-inside text-sm text-red-700" id="passwordResetErrorList">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Success message container -->
+            <div id="passwordResetSuccess" class="mb-4 hidden bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-green-800" id="passwordResetSuccessMessage">Password reset successfully.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="resetPasswordForm" method="POST" action="" class="space-y-5 text-left">
+                @csrf
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">New Password</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="password" name="password" id="reset_password" required
+                            class="shadow-sm focus:ring-[#0284c7] focus:border-[#0284c7] block w-full pr-10 sm:text-sm border-gray-300 rounded-md"
+                            placeholder="Enter new password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <button type="button" id="toggleResetPassword" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="password" name="password_confirmation" id="reset_password_confirmation" required
+                            class="shadow-sm focus:ring-[#0284c7] focus:border-[#0284c7] block w-full pr-10 sm:text-sm border-gray-300 rounded-md"
+                            placeholder="Confirm new password">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <button type="button" id="toggleResetConfirmPassword" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-xs text-gray-500 mt-1">
+                    <p>Password must contain minimum 8 characters with at least one uppercase letter, one lowercase letter, one number, and one special character.</p>
+                    <p class="mt-1">The new password will be emailed to the user.</p>
+                </div>
+                
+                <div class="flex items-center justify-end pt-4 border-t border-gray-200">
+                    <button type="button" onclick="toggleModal('passwordResetModal')" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0284c7] mr-3">
+                        Cancel
+                    </button>
+                    <button type="submit" id="resetPasswordSubmitBtn" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-[#0284c7] hover:bg-[#0369a1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0284c7]">
+                        Reset Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection

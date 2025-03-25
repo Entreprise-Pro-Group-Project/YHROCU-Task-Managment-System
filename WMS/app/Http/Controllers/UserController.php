@@ -13,7 +13,11 @@ use App\Models\User;
 use App\Notifications\UserCreated;
 use App\Notifications\UserUpdated;
 use App\Notifications\UserDeleted;
+use App\Notifications\PasswordChanged;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
@@ -57,10 +61,16 @@ class UserController extends Controller
         // Paginate results; adjust the per-page limit as needed
         $users = $query->paginate(10);
 
+        // Check if a reset_user parameter is present to open the reset modal
+        $resetUser = null;
+        if ($request->has('reset_user')) {
+            $resetUser = User::find($request->input('reset_user'));
+        }
+
         // Append current query parameters to the pagination links if needed:
         // $users->appends($request->query());
 
-        return view('admin.user_management.index', compact('users'));
+        return view('admin.user_management.index', compact('users', 'resetUser'));
     }
 
     public function store(UserStoreRequest $request)
@@ -135,9 +145,17 @@ class UserController extends Controller
                 $changedFields['password'] = $plainPassword;
             }
             
-            if (!empty($changedFields)) {
+            // Prevent duplicate notifications by using a cache key with a short TTL
+            $cacheKey = 'user_updated_' . $user->id;
+            
+            if (!empty($changedFields) && !Cache::has($cacheKey)) {
+                // Set a cache key that expires after 5 seconds to prevent duplicate notifications
+                Cache::put($cacheKey, true, now()->addSeconds(5));
+                
                 $user->notify(new UserUpdated($user, $changedFields));
                 Log::info('User update notification sent', ['user_id' => $user->id, 'fields_changed' => array_keys($changedFields)]);
+            } else if (Cache::has($cacheKey)) {
+                Log::info('Duplicate user update notification prevented', ['user_id' => $user->id]);
             }
             
             if ($request->expectsJson()) {
@@ -190,16 +208,128 @@ class UserController extends Controller
 
     public function resetPassword(PasswordResetRequest $request, $id)
     {
-        $user = User::findOrFail($id);
-        $validated = $request->validated();
-        $user->password = Hash::make($validated['password']);
-        $user->save();
-
-        if ($request->expectsJson()) {
-            return response()->json(['message' => 'Password reset successfully']);
+        try {
+            Log::info('Password reset attempt', [
+                'user_id' => $id,
+                'request_type' => $request->expectsJson() || $request->ajax() ? 'AJAX' : 'Regular'
+            ]);
+            
+            $user = User::findOrFail($id);
+            $validated = $request->validated();
+            $plainPassword = $validated['password'];
+            
+            // Update the user's password
+            $user->password = Hash::make($plainPassword);
+            $user->save();
+            
+            // Send notification to the user with their new password
+            try {
+                Log::info('Sending password changed notification to user', [
+                    'user_id' => $user->id, 
+                    'email' => $user->email
+                ]);
+                
+                // Prevent duplicate notifications by using a cache key with a short TTL
+                $cacheKey = 'password_changed_' . $user->id;
+                
+                if (!Cache::has($cacheKey)) {
+                    // Set a cache key that expires after 5 seconds to prevent duplicate notifications
+                    Cache::put($cacheKey, true, now()->addSeconds(5));
+                    
+                    // Send notification to the user
+                    $user->notify(new PasswordChanged($user, $plainPassword));
+                    
+                    Log::info('Password changed notification sent successfully');
+                } else {
+                    Log::info('Duplicate password changed notification prevented', ['user_id' => $user->id]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Error sending password changed notification: ' . $e->getMessage(), [
+                    'exception' => $e
+                ]);
+                // Continue with success even if notification fails
+            }
+            
+            Log::info('Password reset successfully for user', ['user_id' => $user->id]);
+            
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Password reset successfully. An email with the new password has been sent to the user.'
+                ]);
+            }
+            
+            return redirect()->route('admin.user_management.index')
+                ->with('success', 'Password reset successfully. An email with the new password has been sent to the user.');
+        } catch (\Exception $e) {
+            Log::error('Error resetting password: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => $id
+            ]);
+            
+            if ($request->expectsJson() || $request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while resetting the password',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()->route('admin.user_management.index')
+                ->withErrors(['general' => 'An error occurred while resetting the password: ' . $e->getMessage()]);
         }
-
-        return redirect()->route('admin.user_management.index')
-                         ->with('success', 'Password reset successfully');
+    }
+    
+    public function resetPasswordForm(Request $request, $id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $password = Str::random(12);
+            
+            $user->password = Hash::make($password);
+            $user->save();
+            
+            // Send notification to the user with their new password
+            try {
+                Log::info('Sending password changed notification to user', [
+                    'user_id' => $user->id, 
+                    'email' => $user->email
+                ]);
+                
+                // Prevent duplicate notifications by using a cache key with a short TTL
+                $cacheKey = 'password_reset_' . $user->id;
+                
+                if (!Cache::has($cacheKey)) {
+                    // Set a cache key that expires after 5 seconds to prevent duplicate notifications
+                    Cache::put($cacheKey, true, now()->addSeconds(5));
+                
+                    // Send notification to the user
+                    $user->notify(new PasswordChanged($user, $password));
+                    
+                    // Remove direct mail method to prevent duplicate emails
+                    
+                    Log::info('Password changed notification sent successfully');
+                } else {
+                    Log::info('Duplicate password changed notification prevented', ['user_id' => $user->id]);
+                }
+            } catch (\Exception $e) {
+                Log::error('Error sending password changed notification: ' . $e->getMessage(), [
+                    'exception' => $e
+                ]);
+            }
+            
+            Log::info('Password reset successfully for user', ['user_id' => $user->id]);
+            
+            return redirect()->route('admin.user_management.index')
+                ->with('success', 'Password reset successfully. An email with the new password has been sent to the user.');
+        } catch (\Exception $e) {
+            Log::error('Error resetting password: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => $id
+            ]);
+            
+            return redirect()->route('admin.user_management.index')
+                ->withErrors(['general' => 'An error occurred while resetting the password: ' . $e->getMessage()]);
+        }
     }
 }

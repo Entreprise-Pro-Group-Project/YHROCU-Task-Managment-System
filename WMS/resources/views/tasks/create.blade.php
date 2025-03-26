@@ -15,7 +15,7 @@
         @endif
 
 
-        <form method="POST" action="{{ route('tasks.store') }}">
+        <form method="POST" action="{{ route('tasks.store') }}" novalidate>
             @csrf
             <div class="mb-4">
                 <label for="task_name" class="block text-sm font-medium text-gray-700">Task Name</label>

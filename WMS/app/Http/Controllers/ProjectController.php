@@ -11,6 +11,7 @@ use App\Notifications\ProjectUpdated;
 use App\Notifications\ProjectDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 use Carbon\Carbon;
 
 class ProjectController extends Controller
@@ -38,7 +39,7 @@ class ProjectController extends Controller
             'project_name'       => 'required|string|max:255',
             'project_description'=> 'required|string',
             'project_date'       => 'required|date',
-            'due_date'           => 'required|date',
+            'due_date' => 'required|date|after_or_equal:project_date',
             'supervisor_name'    => 'required|string|max:255',
         ]);
 
@@ -138,7 +139,8 @@ class ProjectController extends Controller
             'project_name'       => 'required|string|max:255',
             'project_description'=> 'required|string',
             'project_date'       => 'required|date',
-            'due_date'           => 'required|date',
+            'due_date' => 'required|date|after_or_equal:project_date',
+
             'supervisor_name'    => 'required|string|max:255',
             'tasks'              => 'nullable|string', // We'll expect a JSON string here
         ]);

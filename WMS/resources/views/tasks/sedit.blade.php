@@ -93,7 +93,11 @@
                         </h2>
                     </div>
                     <div class="p-6">
-                        <form method="POST" action="{{ route('tasks.update', $task->id) }}" class="space-y-6">
+
+<!-- Error container for update form -->
+<div id="updateTaskFormErrors" class="hidden bg-red-100 text-red-700 p-4 rounded mb-4"></div>
+
+                        <form method="POST" action="{{ route('tasks.update', $task->id) }}" class="space-y-6" onsubmit="return validateUpdateTask()" novalidate >
                             @csrf
                             @method('PUT')
                             
@@ -345,4 +349,63 @@
         </div>
     </div>
 </div>
+
+<script>
+    function validateUpdateTask() {
+        // Get the error container
+        var errorContainer = document.getElementById('updateTaskFormErrors');
+        // Clear any previous errors
+        errorContainer.innerHTML = "";
+        errorContainer.classList.add("hidden");
+
+        // Retrieve and trim input values
+        var taskName = document.getElementById("task_name").value.trim();
+        var taskDescription = document.getElementById("task_description").value.trim();
+        var assignedStaff = document.getElementById("assigned_staff").value.trim();
+        var assignedDate = document.getElementById("assigned_date").value.trim();
+        var dueDate = document.getElementById("due_date").value.trim();
+
+        var errors = [];
+
+        // Validate each required field
+        if (!taskName) {
+            errors.push("Task Name is required.");
+        }
+        if (!taskDescription) {
+            errors.push("Task Description is required.");
+        }
+        if (!assignedStaff) {
+            errors.push("Assigned Staff is required.");
+        }
+        if (!assignedDate) {
+            errors.push("Assigned Date is required.");
+        }
+        if (!dueDate) {
+            errors.push("Due Date is required.");
+        }
+
+        // Validate that Due Date is not before Assigned Date
+        if (assignedDate && dueDate) {
+            var assignedDateObj = new Date(assignedDate);
+            var dueDateObj = new Date(dueDate);
+            if (dueDateObj < assignedDateObj) {
+                errors.push("Due Date must be on or after Assigned Date.");
+            }
+        }
+
+        // If there are any errors, display them and prevent form submission
+        if (errors.length > 0) {
+            errorContainer.innerHTML = "<ul>" + errors.map(function(err) {
+                return "<li>" + err + "</li>";
+            }).join("") + "</ul>";
+            errorContainer.classList.remove("hidden");
+            return false;
+        }
+
+        // If validation passes, allow form submission
+        return true;
+    }
+</script>
+
+
 @endsection

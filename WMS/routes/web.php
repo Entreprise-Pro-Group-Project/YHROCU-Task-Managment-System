@@ -12,6 +12,7 @@ use App\Http\Controllers\SupervisorController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaskCommentController;
+use App\Http\Controllers\EmailCheckController;
 
 
 
@@ -54,7 +55,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/users/{user}', [UserController::class, 'show'])->name('admin.user_management.show');
         Route::put('/users/{user}', [UserController::class, 'update'])->name('admin.user_management.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('admin.user_management.destroy');
-        Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.user_management.reset-password');
+        Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('admin.user_management.resetPassword');
+        Route::get('/users/{id}/reset-password', [UserController::class, 'resetPasswordForm'])->name('admin.user_management.resetPasswordForm');
     });
 
     // Supervisor-specific routes
@@ -102,3 +104,32 @@ Route::middleware('auth')->group(function () {
 
 // Include additional auth routes if needed
 require __DIR__.'/auth.php';
+
+// Test email route
+Route::get('/test-email', function() {
+    $admin = \App\Models\User::where('role', 'admin')->first();
+    
+    if (!$admin) {
+        return 'No admin users found. Create one first.';
+    }
+    
+    // Log that we're attempting to send an email
+    \Illuminate\Support\Facades\Log::info('Attempting to send test email to: ' . $admin->email);
+    
+    try {
+        // Send email directly with Mail facade
+        \Illuminate\Support\Facades\Mail::raw('This is a test email to verify mail sending functionality.', function($message) use ($admin) {
+            $message->to($admin->email)
+                    ->subject('Test Email');
+        });
+        
+        \Illuminate\Support\Facades\Log::info('Test email sent successfully');
+        return 'Test email sent to: ' . $admin->email . '. Check your email or logs.';
+    } catch (\Exception $e) {
+        \Illuminate\Support\Facades\Log::error('Error sending test email: ' . $e->getMessage());
+        return 'Error sending test email: ' . $e->getMessage();
+    }
+});
+
+// Route to check if an email exists
+Route::post('/api/check-email', [EmailCheckController::class, 'checkEmail'])->name('api.check.email');

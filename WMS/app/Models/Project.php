@@ -24,22 +24,6 @@ class Project extends Model
     protected static function boot()
     {
         parent::boot();
-
-        static::updating(function ($project) {
-            $original = $project->getOriginal(); // Get old values
-            $changes = $project->getDirty(); // Get changed values
-
-            if (!empty($changes)) {
-                ChangeLog::create([
-                    'entity_type' => 'project',
-                    'entity_id' => $project->id,
-                    'changed_by' => Auth::id(),
-                    'changes' => json_encode([
-                        'before' => $original,
-                        'after' => $changes,
-                    ]),
-                ]);
-            }
-        });
+        // Remove the updating event handler - it's handled by ProjectObserver
     }
 }

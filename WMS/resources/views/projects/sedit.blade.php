@@ -59,13 +59,13 @@
                 Update Project
             </button>
         </form>
-        <a href="/admin/dashboard" class="inline-block bg-blue-400 text-white py-2 px-4 rounded hover:bg-blue-500 mt-4">
+        <a href="{{ route('supervisor.dashboard') }}" class="inline-block bg-blue-400 text-white py-2 px-4 rounded hover:bg-blue-500 mt-4">
             Back
         </a>
     </div>
 
     {{-- Task Modal --}}
-    <div id="taskModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+    <div id="taskModal" class=" hidden fixed inset-0 bg-gray-600 bg-opacity-50 items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <h2 class="text-lg font-bold mb-3">Add Task</h2>
             

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\User;
+use App\Notifications\TaskUpdated;
+use App\Notifications\TaskDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User; 
 
 
 class TaskController extends Controller
@@ -13,7 +15,6 @@ class TaskController extends Controller
     // Show a specific task
     public function show(Task $task)
     {
-        // Retrieve all users with the 'staff' role, ordered by first name
         $users = User::where('role', 'staff')->orderBy('first_name')->get();
         
         if (Auth::user()->role === 'supervisor') {
@@ -26,9 +27,8 @@ class TaskController extends Controller
     
     // Show the form for editing a task
     public function edit(Task $task)
-{
-    // Retrieve all users with the 'staff' role, ordered by first name
-    $users = User::where('role', 'staff')->orderBy('first_name')->get();
+    {
+        $users = User::where('role', 'staff')->orderBy('first_name')->get();
 
     if (Auth::user()->role === 'supervisor') {
         return view('tasks.sedit', compact('task', 'users'));
@@ -54,8 +54,7 @@ public function updateDueDate(Request $request, Task $task)
     }
 
 
-
-    // Update a task
+    // Update a task and notify the assigned user
     public function update(Request $request, Task $task)
     {
         // Check if the request is only updating the status (and optionally comment)
@@ -78,6 +77,12 @@ public function updateDueDate(Request $request, Task $task)
                 'comment' => $comment,
             ]);
 
+            // Notify assigned user about the update
+            $user = User::where('first_name', $task->assigned_staff)->first();
+            if ($user) {
+                $user->notify(new TaskUpdated($task));
+            }
+
             return redirect()->back()->with('success', 'Task updated successfully');
         }
 
@@ -94,13 +99,30 @@ public function updateDueDate(Request $request, Task $task)
 
         $task->update($validated);
 
+        // Notify assigned user about the update
+        $user = User::where('first_name', $task->assigned_staff)->first();
+        if ($user) {
+            $user->notify(new TaskUpdated($task));
+        }
+
+        // Add custom redirect based on user role
+        if (Auth::user()->role === 'supervisor') {
+            return redirect()->route('supervisor.dashboard')->with('success', 'Task updated successfully');
+        }
+        
         return redirect()->route('admin.dashboard')->with('success', 'Task updated successfully');
     }
 
     // Delete a task
     public function destroy(Task $task)
     {
+        $user = User::where('first_name', $task->assigned_staff)->first();
+        if ($user) {
+            $user->notify(new TaskDeleted($task));
+        }
+
         $task->delete();
+
         return redirect()->route('admin.dashboard')->with('success', 'Task deleted successfully');
     }
 
@@ -116,20 +138,15 @@ public function updateDueDate(Request $request, Task $task)
     // Reassign a task to a different staff member
 
     public function reassign(Request $request, Task $task)
-{
-    // Validate that a staff member was selected
-    $validated = $request->validate([
-        'assigned_staff' => 'required|string|max:255',
-    ]);
+    {
+        $validated = $request->validate([
+            'assigned_staff' => 'required|string|max:255',
+        ]);
 
-    // Update the task with the new assigned_staff
-    $task->update($validated);
+        $task->update($validated);
 
-    return redirect()->back()->with('success', 'Task reassigned successfully.');
-}
-
-
-
+        return redirect()->back()->with('success', 'Task reassigned successfully.');
+    }
 
     // Store a new task in the database
     public function store(Request $request)
@@ -143,16 +160,15 @@ public function updateDueDate(Request $request, Task $task)
             'parent_id'      => 'nullable|exists:tasks,id',
         ]);
 
-        // Store the task in the session
         $task = Task::create([
             'task_name'        => $request->task_name,
             'task_description' => $request->task_description,
             'assigned_staff'   => $request->assigned_staff,
             'assigned_date'    => $request->assigned_date,
             'due_date'         => $request->due_date,
-            'parent_id'        => $request->parent_id, // This will only be set if it's a sub-task
+            'parent_id'        => $request->parent_id,
         ]);
-    
+
         return redirect()->route('projects.create')->with('success', 'Task added successfully');
     }
 }

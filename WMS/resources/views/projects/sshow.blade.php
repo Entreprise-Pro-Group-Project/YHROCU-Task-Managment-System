@@ -2,6 +2,8 @@
 
 @section('content')
     <div class="container mx-auto p-4">
+    @livewire('activity-log-table', ['projectId' => $project->id])
+
         <h2 class="text-2xl font-bold mb-4">Project Details</h2>
         <p><strong>Project Name:</strong> {{ $project->project_name }}</p>
         <p><strong>Project Description:</strong> {{ $project->project_description }}</p>

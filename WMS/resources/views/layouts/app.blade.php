@@ -27,7 +27,7 @@
         <!-- Include Navigation -->
         @include('layouts.navigation')
 
-        <!-- Main Layout: Sidebar + Content -->
+        <!-- Main Layout: Sidebar and Content -->
         <div class="flex">
             <!-- Sidebar -->
             <aside class="w-64 bg-[#0284c7] text-white min-h-screen p-6">

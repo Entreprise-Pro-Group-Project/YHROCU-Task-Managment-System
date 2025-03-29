@@ -70,7 +70,7 @@
 </div>
 
 <!-- Task Modal -->
-<div id="taskModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+<div id="taskModal" class="fixed inset-0 hidden items-center justify-center bg-gray-600 bg-opacity-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
         <h3 class="text-lg font-semibold mb-4">Add Task</h3>
         <!-- Error container for task modal -->
@@ -85,6 +85,9 @@
                 <label for="task_description" class="block text-sm font-medium text-gray-700">Task Description</label>
                 <textarea id="task_description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></textarea>
             </div>
+
+            
+
 
             <div class="mb-4">
                 <label for="assigned_staff" class="block text-sm font-medium text-gray-700">Assigned Staff</label>
@@ -109,6 +112,8 @@
                 </select>
             </div>
 
+
+
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                 Add Task
             </button>
@@ -124,11 +129,15 @@
     let tasksArray = {!! old('tasks') ? json_encode(json_decode(old('tasks'))) : '[]' !!};
 
     function openTaskModal() {
-        document.getElementById('taskModal').classList.remove('hidden');
+        const modal = document.getElementById('taskModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function closeTaskModal() {
-        document.getElementById('taskModal').classList.add('hidden');
+        const modal = document.getElementById('taskModal');
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
     }
 
     function submitTask(event) {
@@ -236,5 +245,4 @@
 
     updateTasksDisplay();
 </script>
-
 @endsection

@@ -10,13 +10,24 @@ use App\Models\User;
 
 class ActivityLogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // 1) Fetch logs (adjust query as needed)
-        $logs = ChangeLog::with('user')
-            ->latest()
-            ->limit(50) // or paginate, etc.
-            ->get();
+        // Fetch search term from request
+        $search = $request->input('search');
+        
+        $query = ChangeLog::with('user')->latest();
+        
+        // Apply search filter if provided – adjust the fields as needed
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('entity_type', 'like', "%{$search}%")
+                  ->orWhere('changed_by', 'like', "%{$search}%");
+                  // or add additional filtering on changes column using JSON search if needed
+            });
+        }
+        
+        // Use paginate instead of a fixed limit so the view gets the right row count
+        $logs = $query->paginate(50);
 
         // 2) Collect IDs for tasks, comments, users
         $taskIDs = [];
@@ -74,17 +85,6 @@ class ActivityLogController extends Controller
             $after = $changesArray['after'] ?? [];
 
             // Replace task_id with task_name
-            if (isset($after['task_id']) && isset($tasks[$after['task_id']])) {
-                $after['task_name'] = $tasks[$after['task_id']];
-                unset($after['task_id']);
-            }
-
-            // Replace user_id with user_name
-            if (isset($after['user_id']) && isset($users[$after['user_id']])) {
-                $u = $users[$after['user_id']];
-                $after['user_name'] = $u->first_name . ' ' . $u->last_name;
-                unset($after['user_id']);
-            }
 
             // Put it back
             $changesArray['after'] = $after;
@@ -92,6 +92,6 @@ class ActivityLogController extends Controller
         }
 
         // 5) Return the logs to a Blade view
-        return view('activity-logs.index', compact('logs'));
+        return view('activity-log-table', compact('logs'));
     }
 }

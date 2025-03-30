@@ -341,12 +341,6 @@ class ActivityLogExportController extends Controller
         return $pdf->download($fileName);
     }
     
-    /**
-     * Export Activity Logs to Excel for a specific project.
-     */
-    public function exportExcel($projectId)
-    {
-        // Implementation for Excel export would go here
-        // Similar to CSV but using a library like Laravel Excel
-    }
+
+    
 }

@@ -67,9 +67,9 @@ public function updateDueDate(Request $request, Task $task)
             $status = $request->input('status');
             $comment = $request->input('comment', $task->comment);
 
-            // If the due date has passed and the status is not 'completed', force status to 'overdue'
+            // If the due date has passed and the status is not 'completed', force status to 'over due'
             if (\Carbon\Carbon::parse($task->due_date) < now() && $status !== 'completed') {
-                $status = 'overdue';
+                $status = 'over due';
             }
 
             $task->update([

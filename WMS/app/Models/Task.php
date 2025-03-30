@@ -55,7 +55,7 @@ class Task extends Model
 
     public function getComputedStatusAttribute()
     {
-        // If due date has passed and task isn’t completed, return "over due"
+        // If due date has passed and task isn't completed, return "over due"
         if ($this->due_date < now() && $this->status !== 'completed') {
             return 'over due';
         }

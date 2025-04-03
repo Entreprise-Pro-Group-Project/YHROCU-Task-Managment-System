@@ -28,7 +28,7 @@ class UserUpdateRequest extends FormRequest
             'last_name' => 'sometimes|required|string|max:255',
             'username' => 'sometimes|required|string|max:255|unique:users,username,' . $userId,
             'email' => 'sometimes|required|email|max:255|unique:users,email,' . $userId,
-            'phone_number' => 'nullable|string|max:20|unique:users,phone_number,' . $userId,
+            'phone_number' => 'sometimes|required|string|max:20|unique:users,phone_number,' . $userId,
             'role' => 'sometimes|required|string|in:admin,supervisor,staff',
         ];
     }

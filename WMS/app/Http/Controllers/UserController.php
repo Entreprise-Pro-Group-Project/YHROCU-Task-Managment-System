@@ -101,8 +101,15 @@ class UserController extends Controller
                 'request_data' => $request->all()
             ]);
             
-            return redirect()->route('admin.user_management.index')
-                ->withInput()
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'An error occurred while creating the user: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return redirect()
+                ->route('admin.user_management.index')
+                ->withInput($request->all())
                 ->withErrors(['general' => 'An error occurred while creating the user: ' . $e->getMessage()]);
         }
     }
@@ -165,20 +172,33 @@ class UserController extends Controller
             return redirect()->route('admin.user_management.index')
                              ->with('success', 'User updated successfully' . (!empty($changedFields) ? ' and notification sent' : ''));
         } catch (\Exception $e) {
+            // Don't catch ModelNotFoundException separately - let the test receive it directly
+            if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                throw $e;
+            }
+            
             Log::error('Error updating user: ' . $e->getMessage(), [
                 'exception' => $e,
                 'request_data' => $request->all()
             ]);
             
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error updating user: ' . $e->getMessage()
+                ], 500);
+            }
+            
             return redirect()->route('admin.user_management.index')
-                ->withInput()
+                ->withInput($request->all())
                 ->withErrors(['general' => 'An error occurred while updating the user: ' . $e->getMessage()]);
         }
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
+            // This will throw ModelNotFoundException if user doesn't exist
             $user = User::findOrFail($id);
             
             // Create a direct notification instance with user data before deleting
@@ -189,19 +209,34 @@ class UserController extends Controller
             
             $user->delete();
             
-            if (request()->expectsJson()) {
-                return response()->json(null, 204);
+            if ($request->expectsJson()) {
+                // Return a completely empty response with 204 status
+                return response(null, 204);
             }
             
             return redirect()->route('admin.user_management.index')
                              ->with('success', 'User deleted successfully and notification sent');
         } catch (\Exception $e) {
+            // Don't catch ModelNotFoundException separately - let the test receive it directly
+            if ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                throw $e;
+            }
+            
             Log::error('Error deleting user: ' . $e->getMessage(), [
                 'exception' => $e,
                 'user_id' => $id
             ]);
             
-            return redirect()->route('admin.user_management.index')
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error deleting user: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            // In Laravel, the withErrors method creates a specific session structure
+            return redirect()
+                ->route('admin.user_management.index')
                 ->withErrors(['general' => 'An error occurred while deleting the user: ' . $e->getMessage()]);
         }
     }

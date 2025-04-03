@@ -69,13 +69,6 @@ class LoginTest extends TestCase
     }
     
     #[Test]
-    public function login_throttling_works_after_too_many_attempts()
-    {
-        // This is more of an integration test and might need to be moved
-        $this->markTestSkipped('Login throttling is better tested in a feature test');
-    }
-    
-    #[Test]
     public function auth_session_has_proper_user_data()
     {
         // Create a user with specific role

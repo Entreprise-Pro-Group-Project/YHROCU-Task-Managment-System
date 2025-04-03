@@ -1,0 +1,17 @@
+@extends('layouts.app')
+
+@section('content')
+    <div class="container mx-auto p-4">
+    @livewire('activity-log-table', ['projectId' => $project->id])
+
+        <h2 class="text-2xl font-bold mb-4">Project Details</h2>
+        <p><strong>Project Name:</strong> {{ $project->project_name }}</p>
+        <p><strong>Project Description:</strong> {{ $project->project_description }}</p>
+        <p><strong>Start Date:</strong> {{ $project->project_date }}</p>
+        <p><strong>Due Date:</strong> {{ $project->due_date }}</p>
+        <p><strong>Supervisor:</strong> {{ $project->supervisor_name }}</p>
+        <a href="/admin/dashboard" class="inline-block bg-blue-400 text-white py-2 px-4 rounded hover:bg-blue-500 mt-4">
+            Back
+        </a>
+    </div>
+@endsection

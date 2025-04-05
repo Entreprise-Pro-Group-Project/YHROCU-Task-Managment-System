@@ -86,12 +86,18 @@
                 <textarea id="task_description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required></textarea>
             </div>
 
-            
-
-
             <div class="mb-4">
                 <label for="assigned_staff" class="block text-sm font-medium text-gray-700">Assigned Staff</label>
-                <input type="text" id="assigned_staff" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                <select id="assigned_staff" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                    <option value="">Select Staff Member</option>
+                    @foreach ($users as $staffMember)
+                    @if ($staffMember->role === 'staff')
+                    <option value="{{ $staffMember->first_name }}">
+                        {{ ucfirst($staffMember->first_name) }} {{ ucfirst($staffMember->last_name) }}
+                    </option>
+                    @endif
+                    @endforeach
+                </select>
             </div>
 
             <div class="mb-4">

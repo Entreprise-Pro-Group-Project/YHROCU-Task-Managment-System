@@ -21,7 +21,7 @@
             </div>
             <div class="mb-4">
                 <label for="due_date" class="block text-sm font-medium text-gray-700">Due Date</label>
-                <input type="date" name="due_date" id="due_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ $project->due_date }}" required>
+                <input type="date" name="due_date" id="project_due_date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" value="{{ $project->due_date }}" required>
             </div>
             <div class="mb-4">
                 <label for="supervisor_name" class="block text-sm font-medium text-gray-700">Supervisor Name</label>
@@ -157,7 +157,7 @@
             let projectName = document.getElementById('project_name').value.trim();
             let projectDescription = document.getElementById('project_description').value.trim();
             let projectDate = document.getElementById('project_date').value;
-            let dueDate = document.getElementById('due_date').value;
+            let dueDate = document.getElementById('project_due_date').value;
             let supervisorName = document.getElementById('supervisor_name').value.trim();
 
             let errors = [];

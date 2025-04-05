@@ -15,9 +15,6 @@ use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\EmailCheckController;
 use App\Http\Controllers\ActivityLogExportController;
 
-
-
-
 Route::get('/', function () {
     return auth()->check() 
         ? redirect()->route('dashboard.redirect') 
@@ -91,6 +88,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     Route::put('/tasks/{task}/reassign', [TaskController::class, 'reassign'])->name('tasks.reassign');
     Route::put('/tasks/{task}/update-due-date', [TaskController::class, 'updateDueDate'])->name('tasks.update.due_date');
+    Route::put('/tasks/{task}/update-parent', [TaskController::class, 'updateParent'])->name('tasks.updateParent');
 
     // Task Comment Route
     Route::post('/tasks/{task}/comment', [TaskCommentController::class, 'store'])

@@ -72,7 +72,7 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Admin dropdown
+            // Supervisor dropdown
             const adminButton = document.getElementById('adminButton');
             const adminDropdown = document.getElementById('adminDropdown');
             

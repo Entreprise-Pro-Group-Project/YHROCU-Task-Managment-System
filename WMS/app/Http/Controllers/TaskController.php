@@ -29,35 +29,83 @@ class TaskController extends Controller
     public function edit(Task $task)
     {
         $users = User::where('role', 'staff')->orderBy('first_name')->get();
-
-    if (Auth::user()->role === 'supervisor') {
-        return view('tasks.sedit', compact('task', 'users'));
+        
+        $projectTasks = Task::where('project_id', $task->project_id)->where('id', '!=', $task->id)->get();  // exclude self from parent list
+        
+        if (Auth::user()->role === 'supervisor') {
+            return view('tasks.sedit', compact('task', 'users', 'projectTasks'));
+        }
+        
+        return view('tasks.edit', compact('task', 'users', 'projectTasks'));
     }
-    return view('tasks.edit', compact('task', 'users'));
-}
 
-public function updateDueDate(Request $request, Task $task)
-{
-    // Validate the due_date field
-    $validated = $request->validate([
-        'due_date' => 'required|date',
-    ]);
+    
+    public function updateDueDate(Request $request, Task $task)
+    {  
+        // Validate the due_date field
+        $validated = $request->validate([
+            'due_date' => 'required|date',
+        ]);
+        
+        // Update only the due_date field
+        $task->update($validated);
 
-    // Update only the due_date field
-    $task->update($validated);
-
-    if (Auth::user()->role === 'supervisor') {
-        return redirect()->route('supervisor.dashboard')->with('success', 'Project created successfully');
-    } else {
-        return redirect()->route('admin.dashboard')->with('success', 'Project created successfully');
+        // Notify assigned user about the update
+        $user = User::where('first_name', $task->assigned_staff)->first();
+        if ($user) {
+            $user->notify(new TaskUpdated($task));
+        }
+        
+        if (Auth::user()->role === 'supervisor') {
+            return redirect()->route('supervisor.dashboard')->with('success', 'Project created successfully');
+        } else {
+            return redirect()->route('admin.dashboard')->with('success', 'Project created successfully');
+        }
     }
+
+    // Update the parent task
+    public function updateParent(Request $request, Task $task)
+    {
+        $validated = $request->validate([
+            'parent_id' => 'nullable|exists:tasks,id|not_in:' . $task->id, // prevent self-reference
+        ]);
+            
+        $task->update([
+            'parent_id' => $validated['parent_id'],
+        ]);
+
+        // Notify assigned user about the update
+        $user = User::where('first_name', $task->assigned_staff)->first();
+        if ($user) {
+            $user->notify(new TaskUpdated($task));
+        }
+            
+        return redirect()->back()->with('success', 'Parent task updated successfully.');
+    }
+
+    // Reassign a task to a different staff member
+    public function reassign(Request $request, Task $task)
+    {
+        $validated = $request->validate([
+            'assigned_staff' => 'required|string|max:255',
+        ]);
+
+        $task->update($validated);
+
+        // Notify assigned user about the update
+        $user = User::where('first_name', $task->assigned_staff)->first();
+        if ($user) {
+            $user->notify(new TaskUpdated($task));
+        }
+
+        return redirect()->back()->with('success', 'Task reassigned successfully.');
     }
 
 
     // Update a task and notify the assigned user
     public function update(Request $request, Task $task)
     {
-        // Check if the request is only updating the status (and optionally comment)
+        // Staff comment and status update
         if ($request->has('status') && !$request->hasAny(['task_name', 'assigned_staff', 'due_date', 'parent_id'])) {
             $request->validate([
                 'status'  => 'required|string|in:assigned,in progress,completed,over due',
@@ -78,7 +126,7 @@ public function updateDueDate(Request $request, Task $task)
             ]);
 
             // Notify assigned user about the update
-            $user = User::where('first_name', $task->assigned_staff)->first();
+            $user = User::where('email', $task->assigned_staff)->first();
             if ($user) {
                 $user->notify(new TaskUpdated($task));
             }
@@ -93,7 +141,7 @@ public function updateDueDate(Request $request, Task $task)
             'assigned_staff' => 'required|string|max:255',
             'assigned_date'  => 'required|date',
             'due_date'       => 'required|date',
-            'parent_id'      => 'nullable|exists:tasks,id',
+            'status'           => 'required|string|in:assigned,in progress,completed',
             'comment'        => 'nullable|string',
         ]);
 
@@ -133,19 +181,6 @@ public function updateDueDate(Request $request, Task $task)
             return view('tasks.screate');
         }
         return view('tasks.create');
-    }
-
-    // Reassign a task to a different staff member
-
-    public function reassign(Request $request, Task $task)
-    {
-        $validated = $request->validate([
-            'assigned_staff' => 'required|string|max:255',
-        ]);
-
-        $task->update($validated);
-
-        return redirect()->back()->with('success', 'Task reassigned successfully.');
     }
 
     // Store a new task in the database

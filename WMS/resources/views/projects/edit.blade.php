@@ -3,7 +3,8 @@
 @section('content')
     <div class="container mx-auto p-4">
         <h2 class="text-2xl font-bold mb-4">Edit Project</h2>
-        <form method="POST" action="{{ route('projects.update', $project->id) }}">
+        <div id="projectFormErrors" class="hidden bg-red-100 text-red-700 p-4 rounded mb-4"></div>
+        <form method="POST" action="{{ route('projects.update', $project->id) }}" onsubmit="return validateProjectUpdate()" novalidate>
             @csrf
             @method('PUT')
             <div class="mb-4">
@@ -88,7 +89,7 @@
         </div>
     </div>
 
-    {{-- JavaScript --}}
+    {{-- Existing Task Modal Script --}}
     <script>
         function openTaskModal() {
             document.getElementById('taskModal').classList.remove('hidden');
@@ -99,35 +100,99 @@
         }
 
         function addTask() {
-            let taskName = document.getElementById('task_name').value;
+            let taskName = document.getElementById('task_name').value.trim();
             let taskDesc = document.getElementById('task_description').value;
-            let assignedStaff = document.getElementById('assigned_staff').value;
+            let assignedStaff = document.getElementById('assigned_staff').value.trim();
             let assignedDate = document.getElementById('assigned_date').value;
             let dueDate = document.getElementById('due_date').value;
             let parentTask = document.getElementById('parent_task').value; // Get parent task ID
-            
-            if (taskName && assignedStaff) {
-                let taskList = document.getElementById('task-list');
-                let taskIndex = taskList.children.length;
-                
-                let taskItem = `
-                    <li class="task-item border p-2 rounded mb-2">
-                        <strong>${taskName}</strong> (${assignedStaff})
-                        ${parentTask ? `<br><small>Parent Task: ${parentTask}</small>` : ""}
-                        <input type="hidden" name="tasks[${taskIndex}][task_name]" value="${taskName}">
-                        <input type="hidden" name="tasks[${taskIndex}][task_description]" value="${taskDesc}">
-                        <input type="hidden" name="tasks[${taskIndex}][assigned_staff]" value="${assignedStaff}">
-                        <input type="hidden" name="tasks[${taskIndex}][assigned_date]" value="${assignedDate}">
-                        <input type="hidden" name="tasks[${taskIndex}][due_date]" value="${dueDate}">
-                        <input type="hidden" name="tasks[${taskIndex}][parent_id]" value="${parentTask}">
-                    </li>
-                `;
-                
-                taskList.innerHTML += taskItem;
-                closeTaskModal();
-            } else {
+             
+            if (!taskName || !assignedStaff) {
                 alert("Task name and assigned staff are required.");
+                return;
             }
+            
+            if (!assignedDate || !dueDate) {
+                alert("Both Assigned Date and Due Date are required.");
+                return;
+            }
+            
+            let assignedDateObj = new Date(assignedDate);
+            let dueDateObj = new Date(dueDate);
+            if (dueDateObj < assignedDateObj) {
+                alert("Due Date must be on or after the Assigned Date.");
+                return;
+            }
+            
+            let taskList = document.getElementById('task-list');
+            let taskIndex = taskList.children.length;
+            
+            let taskItem = `
+                <li class="task-item border p-2 rounded mb-2">
+                    <strong>${taskName}</strong> (${assignedStaff})
+                    ${parentTask ? `<br><small>Parent Task: ${parentTask}</small>` : ""}
+                    <input type="hidden" name="tasks[${taskIndex}][task_name]" value="${taskName}">
+                    <input type="hidden" name="tasks[${taskIndex}][task_description]" value="${taskDesc}">
+                    <input type="hidden" name="tasks[${taskIndex}][assigned_staff]" value="${assignedStaff}">
+                    <input type="hidden" name="tasks[${taskIndex}][assigned_date]" value="${assignedDate}">
+                    <input type="hidden" name="tasks[${taskIndex}][due_date]" value="${dueDate}">
+                    <input type="hidden" name="tasks[${taskIndex}][parent_id]" value="${parentTask}">
+                </li>
+            `;
+            
+            taskList.innerHTML += taskItem;
+            closeTaskModal();
         }
     </script>
+
+    {{-- Custom Validation Script for Project Update --}}
+    <script>
+        function validateProjectUpdate() {
+            // Clear any previous errors
+            let errorDiv = document.getElementById('projectFormErrors');
+            errorDiv.innerHTML = "";
+            errorDiv.classList.add("hidden");
+
+            // Retrieve and trim input values
+            let projectName = document.getElementById('project_name').value.trim();
+            let projectDescription = document.getElementById('project_description').value.trim();
+            let projectDate = document.getElementById('project_date').value;
+            let dueDate = document.getElementById('project_due_date').value;
+            let supervisorName = document.getElementById('supervisor_name').value.trim();
+
+            let errors = [];
+
+            if (!projectName) {
+                errors.push("Project name cannot be empty.");
+            }
+            if (!projectDescription) {
+                errors.push("Add description.");
+            }
+            if (!projectDate) {
+                errors.push("Project date is required.");
+            }
+            if (!dueDate) {
+                errors.push("Due date is required.");
+            }
+            if (!supervisorName) {
+                errors.push("Supervisor name is required.");
+            }
+
+            if (projectDate && dueDate) {
+                let projDateObj = new Date(projectDate);
+                let dueDateObj = new Date(dueDate);
+                if (dueDateObj < projDateObj) {
+                    errors.push("Due date must be on or after the project date.");
+                }
+            }
+
+            if (errors.length > 0) {
+                errorDiv.innerHTML = "<ul>" + errors.map(e => "<li>" + e + "</li>").join('') + "</ul>";
+                errorDiv.classList.remove("hidden");
+                return false;
+            }
+            return true;
+        }
+    </script>
+
 @endsection

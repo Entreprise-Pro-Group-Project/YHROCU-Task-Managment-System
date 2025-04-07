@@ -11,6 +11,7 @@ use App\Notifications\ProjectUpdated;
 use App\Notifications\ProjectDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 use Carbon\Carbon;
 
 class ProjectController extends Controller
@@ -38,7 +39,7 @@ class ProjectController extends Controller
             'project_name'       => 'required|string|max:255',
             'project_description'=> 'required|string',
             'project_date'       => 'required|date',
-            'due_date'           => 'required|date',
+            'due_date' => 'required|date|after_or_equal:project_date',
             'supervisor_name'    => 'required|string|max:255',
         ]);
 
@@ -63,11 +64,6 @@ class ProjectController extends Controller
     
                     // Get the correct parent ID if available
                     $parentId = $taskData['parent_id'] ?? null;
-                    if ($parentId && isset($taskIdMapping[$parentId])) {
-                        $parentId = $taskIdMapping[$parentId];
-                    } else {
-                        $parentId = null;
-                    }
     
                     // Create or update task
                     $task = Task::updateOrCreate(
@@ -97,10 +93,10 @@ class ProjectController extends Controller
         // Notify the supervisor about the update.
         $supervisor = User::where('first_name', $request->supervisor_name)->first();
         if ($supervisor) {
-            // Send immediate notification (no delay) about the update
             $supervisor->notify(new ProjectUpdated($project));
         }
         
+        // viewing respective dasboard based on role
         if (Auth::user()->role === 'supervisor') {
             return redirect()->route('supervisor.dashboard')->with('success', 'Project updated successfully');
         } else {
@@ -111,7 +107,7 @@ class ProjectController extends Controller
     // Delete a project (notify before removing from DB)
     public function destroy(Project $project)
     {
-        $supervisor = User::where('first_name', $project->supervisor_name)->first();
+        $supervisor = User::where('email', $project->supervisor_name)->first();
 
         if ($supervisor) {
             $supervisor->notifyNow(new ProjectDeleted($project->id, $project->project_name));
@@ -125,6 +121,9 @@ class ProjectController extends Controller
     
     public function create()
     {
+        $users = User::where('role', 'staff')->get(); 
+        return view('projects.create', compact('users'));
+
         if (Auth::user()->role === 'supervisor') {
             return view('projects.screate');
         }
@@ -138,7 +137,7 @@ class ProjectController extends Controller
             'project_name'       => 'required|string|max:255',
             'project_description'=> 'required|string',
             'project_date'       => 'required|date',
-            'due_date'           => 'required|date',
+            'due_date'           => 'required|date|after_or_equal:project_date',
             'supervisor_name'    => 'required|string|max:255',
             'tasks'              => 'nullable|string', // We'll expect a JSON string here
         ]);

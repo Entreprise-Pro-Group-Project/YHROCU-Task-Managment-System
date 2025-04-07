@@ -20,14 +20,17 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/js/app.js'])
+
     @livewireStyles
+    @livewireScripts
 </head>
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <!-- Include Navigation -->
         @include('layouts.navigation')
 
-        <!-- Main Layout: Sidebar + Content -->
+        <!-- Main Layout: Sidebar and Content -->
         <div class="flex">
             <!-- Sidebar -->
             <aside class="w-64 bg-[#0284c7] text-white min-h-screen p-6">
@@ -126,6 +129,5 @@
     <!-- Add script stack -->
     @stack('scripts')
     @yield('scripts')
-    @livewireScripts
 </body>
 </html>

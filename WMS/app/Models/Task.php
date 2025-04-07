@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'task_name',
         'task_description',
@@ -18,6 +21,12 @@ class Task extends Model
         'status',
         'comment',
     ];
+
+
+    protected $attributes = [
+        'status' => 'assigned',
+    ];
+    
 
     // Relationship with the project
     public function project()
@@ -46,7 +55,7 @@ class Task extends Model
 
     public function getComputedStatusAttribute()
     {
-        // If due date has passed and task isn’t completed, return "over due"
+        // If due date has passed and task isn't completed, return "over due"
         if ($this->due_date < now() && $this->status !== 'completed') {
             return 'over due';
         }
@@ -56,22 +65,6 @@ class Task extends Model
     protected static function boot()
     {
         parent::boot();
-
-        static::updating(function ($task) {
-            $original = $task->getOriginal();
-            $changes = $task->getDirty();
-
-            if (!empty($changes)) {
-                ChangeLog::create([
-                    'entity_type' => 'task',
-                    'entity_id' => $task->id,
-                    'changed_by' => Auth::id(),
-                    'changes' => json_encode([
-                        'before' => $original,
-                        'after' => $changes,
-                    ]),
-                ]);
-            }
-        });
+        // Remove the existing change tracking code here - it's handled by TaskObserver
     }
 }

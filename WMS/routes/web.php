@@ -13,8 +13,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TaskCommentController;
 use App\Http\Controllers\EmailCheckController;
-
-
+use App\Http\Controllers\ActivityLogExportController;
 
 Route::get('/', function () {
     return auth()->check() 
@@ -89,10 +88,20 @@ Route::middleware('auth')->group(function () {
     Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
     Route::put('/tasks/{task}/reassign', [TaskController::class, 'reassign'])->name('tasks.reassign');
     Route::put('/tasks/{task}/update-due-date', [TaskController::class, 'updateDueDate'])->name('tasks.update.due_date');
+    Route::put('/tasks/{task}/update-parent', [TaskController::class, 'updateParent'])->name('tasks.updateParent');
 
     // Task Comment Route
     Route::post('/tasks/{task}/comment', [TaskCommentController::class, 'store'])
         ->name('comment');
+
+    // Export Activity Log Routes
+    Route::get('/logs/export-csv', [ActivityLogExportController::class, 'exportCsv'])->name('logs.export.csv');
+    Route::get('/logs/export-pdf', [ActivityLogExportController::class, 'exportPdf'])->name('logs.export.pdf');
+    Route::get('/logs/export-pdf/{project}', [ActivityLogExportController::class, 'exportPdf'])
+    ->name('logs.export.pdf');
+    Route::get('/logs/export-csv/{project}', [ActivityLogExportController::class, 'exportCsv'])
+    ->name('logs.export.csv');
+
 
     // Dashboard Redirect
     Route::get('/dashboard-redirect', [DashboardController::class, 'redirect'])->name('dashboard.redirect');

@@ -13,11 +13,11 @@ class AdminController extends Controller
     {
         // Update tasks in the database:
         // If a task's due_date is in the past, its status isn't "completed" or already "overdue",
-        // then update its status to "overdue".
+        // then update its status to "over due".
         Task::where('due_date', '<', now())
-            ->where('status', '!=', 'completed')
-            ->where('status', '!=', 'overdue')
-            ->update(['status' => 'overdue']);
+            ->where('status', '<>', 'completed')
+            ->where('status', '<>', 'over due')
+            ->update(['status' => 'over due']);
 
         // Retrieve the status filter from the query parameter, defaulting to 'all'
         $status = $request->query('status', 'all');
@@ -27,7 +27,7 @@ class AdminController extends Controller
             if ($status !== 'all') {
                 if ($status === 'overdue') {
                     // Filter tasks with status "overdue"
-                    $query->where('status', 'overdue');
+                    $query->where('status', 'over due');
                 } else {
                     $query->where('status', $status);
                 }

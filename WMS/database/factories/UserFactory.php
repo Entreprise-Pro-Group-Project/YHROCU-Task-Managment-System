@@ -24,7 +24,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
+            'username' => fake()->unique()->userName(),
+            'phone_number' => fake()->phoneNumber(),
+            'role' => fake()->randomElement(['admin', 'supervisor', 'staff']),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -39,6 +43,36 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+    
+    /**
+     * Configure the model factory to create users with admin role.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'admin',
+        ]);
+    }
+    
+    /**
+     * Configure the model factory to create users with supervisor role.
+     */
+    public function supervisor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'supervisor',
+        ]);
+    }
+    
+    /**
+     * Configure the model factory to create users with staff role.
+     */
+    public function staff(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'staff',
         ]);
     }
 }

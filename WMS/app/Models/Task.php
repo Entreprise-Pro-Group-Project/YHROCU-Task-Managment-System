@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Task extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'task_name',
@@ -22,11 +23,9 @@ class Task extends Model
         'comment',
     ];
 
-
     protected $attributes = [
         'status' => 'assigned',
     ];
-    
 
     // Relationship with the project
     public function project()
@@ -51,8 +50,7 @@ class Task extends Model
         return $this->hasMany(TaskComment::class, 'task_id');
     }
 
-    // helper function to check if the task is overdue
-
+    // Helper function to check if the task is overdue
     public function getComputedStatusAttribute()
     {
         // If due date has passed and task isn't completed, return "over due"

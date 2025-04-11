@@ -107,7 +107,7 @@ class ProjectController extends Controller
     // Delete a project (notify before removing from DB)
     public function destroy(Project $project)
     {
-        $supervisor = User::where('email', $project->supervisor_name)->first();
+        $supervisor = User::where('first_name', $project->supervisor_name)->first();
 
         if ($supervisor) {
             $supervisor->notifyNow(new ProjectDeleted($project->id, $project->project_name));
@@ -122,12 +122,12 @@ class ProjectController extends Controller
     public function create()
     {
         $users = User::where('role', 'staff')->get(); 
-        return view('projects.create', compact('users'));
 
         if (Auth::user()->role === 'supervisor') {
-            return view('projects.screate');
+            return view('projects.screate', compact('users'));
         }
-        return view('projects.create');
+        
+        return view('projects.create', compact('users'));
     }
 
     // Store a new project and its tasks, scheduling notifications for supervisor and tasks

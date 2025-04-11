@@ -9,7 +9,6 @@ use App\Notifications\TaskDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-
 class TaskController extends Controller
 {
     // Show a specific task
@@ -181,29 +180,5 @@ class TaskController extends Controller
             return view('tasks.screate');
         }
         return view('tasks.create');
-    }
-
-    // Store a new task in the database
-    public function store(Request $request)
-    {
-        $request->validate([
-            'task_name'      => 'required|string|max:255',
-            'task_description' => 'required|string',
-            'assigned_staff' => 'required|string|max:255',
-            'assigned_date'  => 'required|date',
-            'due_date'       => 'required|date',
-            'parent_id'      => 'nullable|exists:tasks,id',
-        ]);
-
-        $task = Task::create([
-            'task_name'        => $request->task_name,
-            'task_description' => $request->task_description,
-            'assigned_staff'   => $request->assigned_staff,
-            'assigned_date'    => $request->assigned_date,
-            'due_date'         => $request->due_date,
-            'parent_id'        => $request->parent_id,
-        ]);
-
-        return redirect()->route('projects.create')->with('success', 'Task added successfully');
     }
 }

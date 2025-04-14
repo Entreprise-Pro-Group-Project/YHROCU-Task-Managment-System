@@ -26,11 +26,14 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
+        $users = User::where('role', 'staff')->get();
+        
         if (Auth::user()->role === 'supervisor') {
-            return view('projects.sedit', compact('project'));
+            return view('projects.sedit', compact('project', 'users'));
         }
-        return view('projects.edit', compact('project'));
+        return view('projects.edit', compact('project', 'users'));
     }
+
 
     // Update a project (immediate notifications for updates)
     public function update(Request $request, Project $project)

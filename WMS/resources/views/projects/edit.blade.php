@@ -209,7 +209,17 @@
                         </svg>
                         <label for="assigned_staff" class="block text-sm font-medium text-gray-700">Assigned Staff</label>
                     </div>
-                    <input type="text" id="assigned_staff" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-base py-3">
+                    
+                    <select id="assigned_staff" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-base py-3" required>
+                        <option value="">Select Staff Member</option>
+                        @foreach ($users as $staffMember)
+                        @if ($staffMember->role === 'staff')
+                        <option value="{{ $staffMember->first_name }}">
+                            {{ ucfirst($staffMember->first_name) }} {{ ucfirst($staffMember->last_name) }}
+                        </option>
+                        @endif
+                        @endforeach
+                    </select>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-5">

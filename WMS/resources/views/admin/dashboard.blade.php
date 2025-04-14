@@ -144,6 +144,9 @@
                         <div class="p-4 space-y-3">
                             @if(count($project->tasks) > 0)
                                 @foreach($project->tasks as $task)
+                                    @if($task->parent_id)
+                                        @continue
+                                    @endif
                                     @php
                                         // Check if task is overdue
                                         $isOverdue = \Carbon\Carbon::parse($task->due_date) < \Carbon\Carbon::now() && strtolower($task->status) !== 'completed';

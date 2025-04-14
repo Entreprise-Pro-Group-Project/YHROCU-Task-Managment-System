@@ -51,7 +51,7 @@ class TaskController extends Controller
         $task->update($validated);
 
         // Notify assigned user about the update
-        $user = User::where('first_name', $task->assigned_staff)->first();
+        $user = User::where('email', $task->assigned_staff)->first();
         if ($user) {
             $user->notify(new TaskUpdated($task));
         }
@@ -75,7 +75,7 @@ class TaskController extends Controller
         ]);
 
         // Notify assigned user about the update
-        $user = User::where('first_name', $task->assigned_staff)->first();
+        $user = User::where('email', $task->assigned_staff)->first();
         if ($user) {
             $user->notify(new TaskUpdated($task));
         }
@@ -93,7 +93,7 @@ class TaskController extends Controller
         $task->update($validated);
 
         // Notify assigned user about the update
-        $user = User::where('first_name', $task->assigned_staff)->first();
+        $user = User::where('email', $task->assigned_staff)->first();
         if ($user) {
             $user->notify(new TaskUpdated($task));
         }
@@ -121,10 +121,11 @@ class TaskController extends Controller
             }
 
             $task->update([
-                'status'  => $status,
+                'status'  => $status,          
                 'comment' => $comment,
             ]);
 
+            // Lookup the assigned staff by email instead of first_name
             // Notify assigned user about the update
             $user = User::where('email', $task->assigned_staff)->first();
             if ($user) {
@@ -148,7 +149,7 @@ class TaskController extends Controller
         $task->update($validated);
 
         // Notify assigned user about the update
-        $user = User::where('first_name', $task->assigned_staff)->first();
+        $user = User::where('email', $task->assigned_staff)->first();
         if ($user) {
             $user->notify(new TaskUpdated($task));
         }
@@ -164,9 +165,10 @@ class TaskController extends Controller
     // Delete a task
     public function destroy(Task $task)
     {
-        $user = User::where('first_name', $task->assigned_staff)->first();
+        // Notify assigned user about the update
+        $user = User::where('email', $task->assigned_staff)->first();
         if ($user) {
-            $user->notify(new TaskDeleted($task));
+            $user->notify(new TaskUpdated($task));
         }
 
         $task->delete();

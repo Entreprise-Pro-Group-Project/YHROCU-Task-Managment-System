@@ -28,10 +28,15 @@ class PasswordController extends Controller
             'password.regex' => 'The password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
         ]);
 
+        // Update the user's password
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
 
-        return back()->with('status', 'password-updated');
+        // Log out the user after password update
+        auth()->logout();
+
+        // Redirect to login with a message
+        return redirect()->route('login')->with('status', 'Your password has been updated. Please log in again.');
     }
 }

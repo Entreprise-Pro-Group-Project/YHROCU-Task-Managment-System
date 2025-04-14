@@ -319,7 +319,9 @@ class UserController extends Controller
     {
         try {
             $user = User::findOrFail($id);
-            $password = Str::random(12);
+            
+            // Generate a password that meets complexity requirements
+            $password = $this->generateComplexPassword();
             
             $user->password = Hash::make($password);
             $user->save();
@@ -341,8 +343,6 @@ class UserController extends Controller
                     // Send notification to the user
                     $user->notify(new PasswordChanged($user, $password));
                     
-                    // Remove direct mail method to prevent duplicate emails
-                    
                     Log::info('Password changed notification sent successfully');
                 } else {
                     Log::info('Duplicate password changed notification prevented', ['user_id' => $user->id]);
@@ -359,12 +359,40 @@ class UserController extends Controller
                 ->with('success', 'Password reset successfully. An email with the new password has been sent to the user.');
         } catch (\Exception $e) {
             Log::error('Error resetting password: ' . $e->getMessage(), [
-                'exception' => $e,
-                'user_id' => $id
+                'exception' => $e
             ]);
             
             return redirect()->route('admin.user_management.index')
                 ->withErrors(['general' => 'An error occurred while resetting the password: ' . $e->getMessage()]);
         }
+    }
+
+    /**
+     * Generate a password that meets complexity requirements
+     */
+    private function generateComplexPassword(): string
+    {
+        $lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        $uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $numbers = '0123456789';
+        $special = '@$!%*?&';
+        
+        // Get at least one of each required character type
+        $password = [
+            $lowercase[random_int(0, strlen($lowercase) - 1)],
+            $uppercase[random_int(0, strlen($uppercase) - 1)],
+            $numbers[random_int(0, strlen($numbers) - 1)],
+            $special[random_int(0, strlen($special) - 1)]
+        ];
+        
+        // Add 8 more random characters
+        $allChars = $lowercase . $uppercase . $numbers . $special;
+        for ($i = 0; $i < 8; $i++) {
+            $password[] = $allChars[random_int(0, strlen($allChars) - 1)];
+        }
+        
+        // Shuffle the password array and convert to string
+        shuffle($password);
+        return implode('', $password);
     }
 }

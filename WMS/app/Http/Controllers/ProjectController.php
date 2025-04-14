@@ -122,7 +122,7 @@ class ProjectController extends Controller
     
     public function create()
     {
-        $users = User::where('role', 'staff')->get();
+        $users = User::where('role', 'staff')->get(); 
 
         if (Auth::user()->role === 'supervisor') {
             return view('projects.screate', compact('users'));

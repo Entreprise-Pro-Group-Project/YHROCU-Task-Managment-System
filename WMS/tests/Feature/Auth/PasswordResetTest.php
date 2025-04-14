@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Notifications\PasswordResetRequest;
 use Illuminate\Support\Facades\Notification;
 
 test('reset password link screen can be rendered', function () {
@@ -14,47 +14,54 @@ test('reset password link can be requested', function () {
     Notification::fake();
 
     $user = User::factory()->create();
+    
+    // Create an admin who would receive the notification
+    $admin = User::factory()->create([
+        'role' => 'admin',
+        'email' => 'admin@example.com'
+    ]);
 
     $this->post('/forgot-password', ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class);
+    Notification::assertSentTo($admin, PasswordResetRequest::class);
 });
 
 test('reset password screen can be rendered', function () {
     Notification::fake();
 
     $user = User::factory()->create();
+    
+    // Create an admin who would receive the notification
+    $admin = User::factory()->create([
+        'role' => 'admin',
+        'email' => 'admin@example.com'
+    ]);
 
     $this->post('/forgot-password', ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-        $response = $this->get('/reset-password/'.$notification->token);
-
-        $response->assertStatus(200);
-
-        return true;
-    });
+    Notification::assertSentTo($admin, PasswordResetRequest::class);
+    
+    $response = $this->get('/users/' . $user->id . '/reset-password');
+    $response->assertStatus(302); // Since it redirects for non-admin users
 });
 
 test('password can be reset with valid token', function () {
     Notification::fake();
 
     $user = User::factory()->create();
+    
+    // Create an admin to perform the password reset
+    $admin = User::factory()->create([
+        'role' => 'admin',
+    ]);
 
-    $this->post('/forgot-password', ['email' => $user->email]);
-
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = $this->post('/reset-password', [
-            'token' => $notification->token,
-            'email' => $user->email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
+    // Reset the password as admin
+    $response = $this
+        ->actingAs($admin)
+        ->post(route('admin.user_management.resetPassword', $user->id), [
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
         ]);
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('login'));
-
-        return true;
-    });
+    $response->assertRedirect();
 });

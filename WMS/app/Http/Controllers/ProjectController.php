@@ -105,7 +105,7 @@ class ProjectController extends Controller
             $supervisor->notify(new ProjectUpdated($project));
         }
         
-        // viewing respective dasboard based on role
+        // viewing respective dashboard based on role
         if (Auth::user()->role === 'supervisor') {
             return redirect()->route('supervisor.dashboard')->with('success', 'Project updated successfully');
         } else {

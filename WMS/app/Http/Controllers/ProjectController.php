@@ -27,11 +27,13 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $users = User::where('role', 'staff')->get();
+
+        $supervisors = User::where('role', 'supervisor')->get();
         
         if (Auth::user()->role === 'supervisor') {
-            return view('projects.sedit', compact('project', 'users'));
+            return view('projects.sedit', compact('project', 'users', 'supervisors'));
         }
-        return view('projects.edit', compact('project', 'users'));
+        return view('projects.edit', compact('project', 'users', 'supervisors'));
     }
 
 
@@ -127,11 +129,13 @@ class ProjectController extends Controller
     {
         $users = User::where('role', 'staff')->get(); 
 
+        $supervisors = User::where('role', 'supervisor')->get();
+
         if (Auth::user()->role === 'supervisor') {
-            return view('projects.screate', compact('users'));
+            return view('projects.screate', compact('users', 'supervisors'));
         }
         
-        return view('projects.create', compact('users'));
+        return view('projects.create', compact('users', 'supervisors'));
     }
 
     // Store a new project and its tasks, scheduling notifications for supervisor and tasks

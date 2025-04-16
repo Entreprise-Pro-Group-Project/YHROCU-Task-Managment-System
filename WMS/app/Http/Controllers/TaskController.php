@@ -8,6 +8,7 @@ use App\Notifications\TaskUpdated;
 use App\Notifications\TaskDeleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
@@ -104,61 +105,109 @@ class TaskController extends Controller
     // Update a task and notify the assigned user
     public function update(Request $request, Task $task)
     {
-        // Staff comment and status update
-        if ($request->has('status') && !$request->hasAny(['task_name', 'assigned_staff', 'due_date', 'parent_id'])) {
-            $request->validate([
-                'status'  => 'required|string|in:assigned,in progress,completed,over due',
-                'comment' => 'nullable|string',
-            ]);
+        try {
+            // Staff comment and status update
+            if ($request->has('status') && !$request->hasAny(['task_name', 'assigned_staff', 'due_date', 'parent_id'])) {
+                $request->validate([
+                    'status'  => 'required|string|in:assigned,in progress,completed,over due',
+                    'comment' => 'nullable|string',
+                ]);
 
-            $status = $request->input('status');
-            $comment = $request->input('comment', $task->comment);
+                $status = $request->input('status');
+                $comment = $request->input('comment', $task->comment);
 
-            // If the due date has passed and the status is not 'completed', force status to 'over due'
-            if (\Carbon\Carbon::parse($task->due_date) < now() && $status !== 'completed') {
-                $status = 'over due';
+                // If the due date has passed and the status is not 'completed', force status to 'over due'
+                if (\Carbon\Carbon::parse($task->due_date) < now() && $status !== 'completed') {
+                    $status = 'over due';
+                }
+
+                $task->update([
+                    'status'  => $status,          
+                    'comment' => $comment,
+                ]);
+
+                // Lookup the assigned staff by email instead of first_name
+                // Notify assigned user about the update
+                $user = User::where('email', $task->assigned_staff)->first();
+                if ($user) {
+                    Log::info('Sending task update notification', [
+                        'task_id' => $task->id,
+                        'user_id' => $user->id,
+                        'status' => $status
+                    ]);
+                    
+                    try {
+                        $user->notify(new TaskUpdated($task));
+                        Log::info('Task update notification sent successfully', [
+                            'task_id' => $task->id,
+                            'user_id' => $user->id
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error('Failed to send task update notification', [
+                            'task_id' => $task->id,
+                            'user_id' => $user->id,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                } else {
+                    Log::warning('Could not find user to notify about task update', [
+                        'task_id' => $task->id,
+                        'assigned_staff_email' => $task->assigned_staff
+                    ]);
+                }
+
+                return redirect()->back()->with('success', 'Task updated successfully');
             }
 
-            $task->update([
-                'status'  => $status,          
-                'comment' => $comment,
+            // Otherwise, process the full update (including comment)
+            $validated = $request->validate([
+                'task_name'      => 'required|string|max:255',
+                'task_description' => 'required|string',
+                'assigned_staff' => 'required|string|max:255',
+                'assigned_date'  => 'required|date',
+                'due_date'       => 'required|date',
+                'status'        => 'required|string|in:assigned,in progress,completed',
+                'comment'       => 'nullable|string',
             ]);
 
-            // Lookup the assigned staff by email instead of first_name
+            $task->update($validated);
+
             // Notify assigned user about the update
             $user = User::where('email', $task->assigned_staff)->first();
             if ($user) {
-                $user->notify(new TaskUpdated($task));
+                Log::info('Sending task update notification for full update', [
+                    'task_id' => $task->id,
+                    'user_id' => $user->id
+                ]);
+                
+                try {
+                    $user->notify(new TaskUpdated($task));
+                    Log::info('Task update notification sent successfully', [
+                        'task_id' => $task->id,
+                        'user_id' => $user->id
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send task update notification', [
+                        'task_id' => $task->id,
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
-            return redirect()->back()->with('success', 'Task updated successfully');
+            // Add custom redirect based on user role
+            if (Auth::user()->role === 'supervisor') {
+                return redirect()->route('supervisor.dashboard')->with('success', 'Task updated successfully');
+            }
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Task updated successfully');
+        } catch (\Exception $e) {
+            Log::error('Error updating task', [
+                'task_id' => $task->id,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Failed to update task. Please try again.');
         }
-
-        // Otherwise, process the full update (including comment)
-        $validated = $request->validate([
-            'task_name'      => 'required|string|max:255',
-            'task_description' => 'required|string',
-            'assigned_staff' => 'required|string|max:255',
-            'assigned_date'  => 'required|date',
-            'due_date'       => 'required|date',
-            'status'           => 'required|string|in:assigned,in progress,completed',
-            'comment'        => 'nullable|string',
-        ]);
-
-        $task->update($validated);
-
-        // Notify assigned user about the update
-        $user = User::where('email', $task->assigned_staff)->first();
-        if ($user) {
-            $user->notify(new TaskUpdated($task));
-        }
-
-        // Add custom redirect based on user role
-        if (Auth::user()->role === 'supervisor') {
-            return redirect()->route('supervisor.dashboard')->with('success', 'Task updated successfully');
-        }
-        
-        return redirect()->route('admin.dashboard')->with('success', 'Task updated successfully');
     }
 
     // Delete a task

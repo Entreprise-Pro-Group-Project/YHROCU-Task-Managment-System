@@ -44,7 +44,7 @@ class ProjectController extends Controller
             'project_name'       => 'required|string|max:255',
             'project_description'=> 'required|string',
             'project_date'       => 'required|date',
-            'due_date' => 'required|date|after_or_equal:project_date',
+            'due_date'          => 'required|date|after_or_equal:project_date',
             'supervisor_name'    => 'required|string|max:255',
         ]);
 
@@ -70,6 +70,9 @@ class ProjectController extends Controller
                     // Get the correct parent ID if available
                     $parentId = $taskData['parent_id'] ?? null;
     
+                    // Check if this is a new task or an existing one
+                    $isNewTask = !isset($taskData['id']);
+                    
                     // Create or update task
                     $task = Task::updateOrCreate(
                         ['id' => $taskData['id'] ?? null],
@@ -87,10 +90,10 @@ class ProjectController extends Controller
                     // Store task ID for future parent reference
                     $taskIdMapping[$taskData['task_name']] = $task->id;
 
-                    $user = User::where('first_name', $task['assigned_staff'])->first();
-    
-                    if ($user) {
-                        $user->notify(new TaskAssigned($task));
+                    // Only send TaskAssigned notification for new tasks
+                    if ($isNewTask && $user) {
+                        $taskDelay = Carbon::parse($taskData['assigned_date'])->startOfDay();
+                        $user->notify((new TaskAssigned($task))->delay($taskDelay));
                     }
                 }
             }

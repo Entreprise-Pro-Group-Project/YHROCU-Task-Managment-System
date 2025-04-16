@@ -213,15 +213,23 @@ class TaskController extends Controller
     // Delete a task
     public function destroy(Task $task)
     {
-        // Notify assigned user about the update
-        $user = User::where('email', $task->assigned_staff)->first();
-        if ($user) {
-            $user->notify(new TaskUpdated($task));
+        try {
+            // Notify assigned user about the deletion
+            $user = User::where('email', $task->assigned_staff)->first();
+            if ($user) {
+                $user->notify(new TaskDeleted($task));
+            }
+
+            $task->delete();
+
+            return redirect()->route('admin.dashboard')->with('success', 'Task deleted successfully');
+        } catch (\Exception $e) {
+            Log::error('Error deleting task', [
+                'task_id' => $task->id,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Failed to delete task. Please try again.');
         }
-
-        $task->delete();
-
-        return redirect()->route('admin.dashboard')->with('success', 'Task deleted successfully');
     }
 
     // Show the form for creating a new task

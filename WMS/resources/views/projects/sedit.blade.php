@@ -42,7 +42,16 @@
                             </svg>
                             <label for="supervisor_name" class="block text-sm font-medium text-gray-700">Supervisor Name</label>
                         </div>
-                        <input type="text" name="supervisor_name" id="supervisor_name" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-base py-3" value="{{ $project->supervisor_name }}" required>
+                        
+                        <select name="supervisor_name" id="supervisor_name" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-base py-3" required>
+                            <option value="">Select Supervisor</option>
+                            @foreach ($supervisors as $supervisor)
+                            <option value="{{ $supervisor->first_name }}" 
+                                @if ($project->supervisor_name === $supervisor->first_name) selected @endif>
+                                {{ ucfirst($supervisor->first_name) }} {{ ucfirst($supervisor->last_name) }}
+                            </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 

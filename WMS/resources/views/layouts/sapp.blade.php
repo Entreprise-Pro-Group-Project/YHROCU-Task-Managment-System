@@ -1,111 +1,99 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Supervisor</title>
+  <title>Supervisor</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.bunny.net">
+  <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @vite(['resources/js/app.js'])
-    @livewireStyles
-    @livewireScripts
-
+  <!-- Scripts & Styles -->
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @livewireStyles
+  @livewireScripts
+  <script src="https://unpkg.com/feather-icons"></script>
 </head>
-<body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-        <!-- Include Navigation -->
-        @include('layouts.navigation')
 
-        <!-- Main Layout: Sidebar and Content -->
-        <div class="flex">
-            <!-- Sidebar -->
-            <aside class="w-64 bg-[#0284c7] text-white min-h-screen p-6">
-                <nav class="space-y-2">
-                    <!-- Dashboard Link -->
-                    <a href="{{ route('supervisor.dashboard') }}" class="flex items-center p-2 rounded hover:bg-[#0273a3]">
-                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zM3 9h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-                        </svg>
-                        <span class="ml-2">Dashboard</span>
-                    </a>
+{{-- add pt-16 to push content below the fixed nav --}}
+<body>
+  
+  {{-- Fixed top navigation --}}
+  @include('layouts.navigation')
 
-                    <!-- Add Projects Link -->
-                    <a href="{{ route('projects.create') }}" class="flex items-center p-2 rounded hover:bg-[#0273a3]">
-                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M14 2H4c-1.1 0-2 .9-2 2v16l4-4h8c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM20 6h2v12h-2z"/>
-                        </svg>
-                        <span class="ml-2">Add Projects</span>
-                    </a>
-                </nav>
-            </aside>
+  {{-- Main layout: sidebar + content --}}
+  <div class="flex min-h-[calc(100vh-4rem)]">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0284c7] text-white p-6 hidden md:block">
+      <nav class="space-y-2">
+        <a href="{{ route('supervisor.dashboard') }}"
+           class="flex items-center p-2 rounded hover:bg-[#0273a3] transition">
+          <i data-feather="home" class="h-5 w-5"></i>
+          <span class="ml-2">Dashboard</span>
+        </a>
 
-            <!-- Main Content -->
-            <main class="flex-1 p-6">
-                <!-- Page Heading -->
-                @isset($header)
-                    <header class="bg-white dark:bg-gray-800 shadow">
-                        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                            {{ $header }}
-                        </div>
-                    </header>
-                @endisset
+        <a href="{{ route('projects.create') }}"
+           class="flex items-center p-2 rounded hover:bg-[#0273a3] transition">
+          <i data-feather="plus-square" class="h-5 w-5"></i>
+          <span class="ml-2">Add Projects</span>
+        </a>
+      </nav>
+    </aside>
 
-                <!-- Page Content -->
-                <div>
-                    @if(session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                    @endif
+    <!-- Content Area -->
+    <main class="flex-1 p-6 overflow-auto">
+      @isset($header)
+        <header class="bg-white dark:bg-gray-800 shadow mb-6">
+          <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            {{ $header }}
+          </div>
+        </header>
+      @endisset
 
-                    @yield('content')
-                </div>
-            </main>
+      @if(session('error'))
+        <div class="mb-6 p-4 bg-red-100 text-red-800 rounded-lg">
+          {{ session('error') }}
         </div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Supervisor dropdown
-            const adminButton = document.getElementById('adminButton');
-            const adminDropdown = document.getElementById('adminDropdown');
-            
-            // Filter dropdown
-            const filterButton = document.getElementById('filterButton');
-            const filterDropdown = document.getElementById('filterDropdown');
+      @endif
 
-            if (adminButton && adminDropdown) {
-                adminButton.addEventListener('click', function (e) {
-                    e.stopPropagation(); 
-                    // Close filter dropdown if open
-                    if (filterDropdown) filterDropdown.classList.add('hidden');
-                    // Toggle admin dropdown visibility
-                    adminDropdown.classList.toggle('hidden');
-                });
-            }
+      @yield('content')
+    </main>
+  </div>
 
-            if (filterButton && filterDropdown) {
-                filterButton.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    // Close admin dropdown if open
-                    if (adminDropdown) adminDropdown.classList.add('hidden');
-                    // Toggle filter dropdown visibility
-                    filterDropdown.classList.toggle('hidden');
-                });
-            }
+  <!-- Feather Icons + Dropdown JS -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      feather.replace();
 
-            // Hide both dropdowns when clicking anywhere else
-            document.addEventListener('click', function () {
-                if (adminDropdown) adminDropdown.classList.add('hidden');
-                if (filterDropdown) filterDropdown.classList.add('hidden');
-            });
+      const adminButton   = document.getElementById('adminButton');
+      const adminDropdown = document.getElementById('adminDropdown');
+      const filterButton  = document.getElementById('filterButton');
+      const filterDropdown= document.getElementById('filterDropdown');
+
+      if (adminButton && adminDropdown) {
+        adminButton.addEventListener('click', e => {
+          e.stopPropagation();
+          filterDropdown?.classList.add('hidden');
+          adminDropdown.classList.toggle('hidden');
         });
-    </script>
+      }
+
+      if (filterButton && filterDropdown) {
+        filterButton.addEventListener('click', e => {
+          e.stopPropagation();
+          adminDropdown?.classList.add('hidden');
+          filterDropdown.classList.toggle('hidden');
+        });
+      }
+
+      document.addEventListener('click', () => {
+        adminDropdown?.classList.add('hidden');
+        filterDropdown?.classList.add('hidden');
+      });
+    });
+  </script>
 </body>
 </html>

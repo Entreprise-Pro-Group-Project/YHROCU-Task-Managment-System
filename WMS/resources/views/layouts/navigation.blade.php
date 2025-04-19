@@ -2,10 +2,22 @@
     use Illuminate\Support\Facades\Auth;
 @endphp
 <nav class="bg-[#0284c7] text-white px-6 py-4 flex items-center">
-    <!-- Left Column: App Name -->
-    <div class="flex-1 font-bold text-lg">
-        <span class="text-3xl">YHROCU</span>
-        <span class="text-sm">Workflow Management System</span>
+    <!-- Left Column: Logo -->
+    <div class="flex-1">
+        <a href="{{ route('dashboard.redirect') }}" class="logo-container">
+            <div class="flex items-center">
+                <div class="logo-wrapper" style="width: 3.5rem; height: 3.5rem;">
+                    <!-- Main logo image -->
+                    <img src="{{ asset('logo/logo.png') }}" alt="YHROCU Logo" class="logo-image">
+                    <!-- Animated accent element -->
+                    <div class="logo-accent"></div>
+                </div>
+                <div class="logo-text ml-3">
+                    <span class="text-2xl font-bold">YHROCU</span>
+                    <span class="text-sm block">Workflow Management System</span>
+                </div>
+            </div>
+        </a>
     </div>
 
     <!-- Center Column: Welcome Message -->
@@ -121,7 +133,6 @@
 
         // Ensure the dropdown starts hidden (redundant if HTML is correct, but safer)
         if (!adminDropdown.classList.contains('hidden')) {
-            adminDropdown.classList.add('hidden');
         }
 
         // Toggle visibility
@@ -132,7 +143,6 @@
                 adminDropdown.classList.remove('hidden');
                 console.log("Hidden class removed. Current classList:", adminDropdown.classList);
             } else {
-                adminDropdown.classList.add('hidden');
                 console.log("Hidden class added. Current classList:", adminDropdown.classList);
             }
         });
@@ -158,69 +168,3 @@
     });
 </script>
 
-
-
-<style>
-    @keyframes wave {
-        0% { transform: rotate(0deg); }
-        10% { transform: rotate(14deg); }
-        20% { transform: rotate(-8deg); }
-        30% { transform: rotate(14deg); }
-        40% { transform: rotate(-4deg); }
-        50% { transform: rotate(10deg); }
-        60% { transform: rotate(0deg); }
-        100% { transform: rotate(0deg); }
-    }
-    .animate-wave {
-        animation: wave 2.5s ease infinite;
-        transform-origin: 70% 70%;
-    }
-    @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.9; }
-    }
-    .animate-pulse-slow {
-        animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-</style>
-
-<!-- Make sure this goes just above  -->
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-        const adminButton = document.getElementById('adminButton');
-        const adminDropdown = document.getElementById('adminDropdown');
-
-        
-
-        if (!adminButton || !adminDropdown) {
-            console.log("Admin button or dropdown not found!");
-            return;
-        }
-
-        adminButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    console.log("Admin button clicked!");
-    if (adminDropdown.classList.contains('hidden')) {
-        adminDropdown.classList.remove('hidden');
-    } else {
-        adminDropdown.classList.add('hidden');
-    }
-});
-
-        document.addEventListener('click', (e) => {
-            if (!adminDropdown.classList.contains('hidden') &&
-                !adminButton.contains(e.target) &&
-                !adminDropdown.contains(e.target)
-            ) {
-                console.log("Click outside detected, hiding dropdown.");
-                adminDropdown.classList.add('hidden');
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                adminDropdown.classList.add('hidden');
-            }
-        });
-    });
-</script>

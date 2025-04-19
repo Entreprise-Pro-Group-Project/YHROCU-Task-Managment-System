@@ -347,8 +347,10 @@
         const filterDropdown = document.getElementById('filterDropdown');
         
         if (filterButton && filterDropdown) {
-            filterButton.addEventListener('click', function() {
-                
+            filterButton.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent event from bubbling
+                // Toggle filter dropdown visibility
+                filterDropdown.classList.toggle('hidden');
             });
             
             // Close dropdown when clicking outside

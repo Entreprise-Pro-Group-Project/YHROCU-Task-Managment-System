@@ -14,8 +14,10 @@ use Illuminate\Support\Facades\Auth;
 
 use Carbon\Carbon;
 
+// ProjectController handles CRUD operations and notifications for projects and their tasks
 class ProjectController extends Controller
 {
+    // Display a specific project based on user role
     public function show(Project $project)
     {
         if (Auth::user()->role === 'supervisor') {
@@ -24,10 +26,12 @@ class ProjectController extends Controller
         return view('projects.show', compact('project'));
     }
 
+    // Show the form for editing a project
     public function edit(Project $project)
     {
+        // Get all staff users
         $users = User::where('role', 'staff')->get();
-
+        // Get all supervisors
         $supervisors = User::where('role', 'supervisor')->get();
         
         if (Auth::user()->role === 'supervisor') {
@@ -36,10 +40,10 @@ class ProjectController extends Controller
         return view('projects.edit', compact('project', 'users', 'supervisors'));
     }
 
-
-    // Update a project (immediate notifications for updates)
+    // Update a project and its tasks, send notifications for updates
     public function update(Request $request, Project $project)
     {
+        // Validate incoming request data
         $request->validate([
             'project_name'       => 'required|string|max:255',
             'project_description'=> 'required|string',
@@ -60,7 +64,7 @@ class ProjectController extends Controller
         // Array to map temporary task names to their actual IDs
         $taskIdMapping = [];
 
-        // Process tasks
+        // Process each task from the request
         if ($request->has('tasks')) {
             foreach ($request->tasks as $taskData) {
                 if (!empty($taskData['task_name'])) {
@@ -99,13 +103,13 @@ class ProjectController extends Controller
             }
         }
         
-        // Notify the supervisor about the update.
+        // Notify the supervisor about the update
         $supervisor = User::where('first_name', $request->supervisor_name)->first();
         if ($supervisor) {
             $supervisor->notify(new ProjectUpdated($project));
         }
         
-        // viewing respective dasboard based on role
+        // Redirect to the appropriate dashboard based on user role
         if (Auth::user()->role === 'supervisor') {
             return redirect()->route('supervisor.dashboard')->with('success', 'Project updated successfully');
         } else {
@@ -113,25 +117,28 @@ class ProjectController extends Controller
         }
     }
 
-    // Delete a project (notify before removing from DB)
+    // Delete a project and notify the supervisor before deletion
     public function destroy(Project $project)
     {
+        // Find supervisor by first name
         $supervisor = User::where('first_name', $project->supervisor_name)->first();
 
         if ($supervisor) {
             $supervisor->notifyNow(new ProjectDeleted($project->id, $project->project_name));
         }
 
-        // Now remove the project from the database
+        // Remove the project from the database
         $project->delete();
 
         return redirect()->route('admin.dashboard')->with('success', 'Project deleted successfully');
     }
     
+    // Show the form for creating a new project
     public function create()
     {
+        // Get all staff users
         $users = User::where('role', 'staff')->get(); 
-
+        // Get all supervisors
         $supervisors = User::where('role', 'supervisor')->get();
 
         if (Auth::user()->role === 'supervisor') {
@@ -141,9 +148,10 @@ class ProjectController extends Controller
         return view('projects.create', compact('users', 'supervisors'));
     }
 
-    // Store a new project and its tasks, scheduling notifications for supervisor and tasks
+    // Store a new project and its tasks, schedule notifications for supervisor and tasks
     public function store(Request $request)
     {
+        // Validate incoming request data
         $request->validate([
             'project_name'       => 'required|string|max:255',
             'project_description'=> 'required|string',
@@ -171,9 +179,10 @@ class ProjectController extends Controller
         // Delay for supervisor notification = project start date
         $supervisorDelay = Carbon::parse($project->project_date)->startOfDay();
 
-        // Array to map temporary names to actual IDs if needed for sub-task parent references
+        // Array to map temporary names to actual IDs for sub-task parent references
         $taskIdMapping = [];
 
+        // Create each task and schedule notifications
         foreach ($tasks as $taskData) {
             // Find user by first name
             $user = User::where('first_name', $taskData['assigned_staff'])->first();
@@ -214,6 +223,7 @@ class ProjectController extends Controller
             $supervisor->notify((new ProjectCreated($project))->delay($supervisorDelay));
         }
 
+        // Redirect to the appropriate dashboard based on user role
         if (Auth::user()->role === 'supervisor') {
             return redirect()->route('supervisor.dashboard')->with('success', 'Project created successfully');
         } else {

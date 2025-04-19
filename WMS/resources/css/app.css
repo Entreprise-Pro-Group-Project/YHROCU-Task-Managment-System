@@ -1,3 +1,98 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Wave Animation */
+    @keyframes wave {
+        0% { transform: rotate(0deg); }
+        10% { transform: rotate(14deg); }
+        20% { transform: rotate(-8deg); }
+        30% { transform: rotate(14deg); }
+        40% { transform: rotate(-4deg); }
+        50% { transform: rotate(10deg); }
+        60% { transform: rotate(0deg); }
+        100% { transform: rotate(0deg); }
+    }
+
+    .animate-wave {
+        animation: wave 2.5s ease infinite;
+        transform-origin: 70% 70%;
+    }
+
+    /* Pulse Animation */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.9; }
+    }
+
+    .animate-pulse-slow {
+        animation: pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Logo Styling */
+    .logo-container {
+        @apply flex items-center;
+        transition: transform 0.3s ease;
+    }
+
+    .logo-container:hover {
+        transform: scale(1.02);
+    }
+
+    .logo-wrapper {
+        @apply relative flex items-center justify-center;
+        width: 7rem;
+        height: 7rem;
+        border-radius: 9999px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .logo-image {
+        @apply w-[95%] h-[95%] object-contain z-[2];
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
+    }
+
+    .logo-accent {
+        @apply absolute z-[1];
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, rgba(14, 165, 233, 0) 70%);
+        animation: accent-pulse 3s infinite ease-in-out;
+    }
+
+    .logo-text {
+        @apply flex flex-col ml-4;
+    }
+
+    .logo-title {
+        @apply text-2xl font-bold tracking-wider text-white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo-subtitle {
+        @apply text-sm font-medium tracking-wide text-white/85;
+    }
+
+    @keyframes accent-pulse {
+        0% { transform: scale(1); opacity: 0.3; }
+        50% { transform: scale(1.1); opacity: 0.5; }
+        100% { transform: scale(1); opacity: 0.3; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .logo-wrapper {
+            width: 5rem;
+            height: 5rem;
+        }
+        
+        .logo-text {
+            @apply hidden;
+        }
+    }
+}

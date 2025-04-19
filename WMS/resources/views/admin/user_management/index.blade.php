@@ -25,7 +25,7 @@
                     <button 
                         type="button" 
                         onclick="toggleModal('addUserModal')" 
-                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0284c7] hover:bg-[#0369a1] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0284c7] transition-colors duration-200"
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-700 transition-colors duration-200"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
@@ -94,7 +94,7 @@
                                 </div>
                                 <!-- Search input with extra right padding -->
                                 <input type="text" id="search" name="search" placeholder="Search users..." value="{{ request('search') }}"
-                                       class="focus:ring-[#0284c7] focus:border-[#0284c7] block w-full pl-10 pr-10 sm:text-sm border-gray-300 rounded-md">
+                                       class="focus:ring-blue-500 focus:border-blue-600 block w-full pl-10 pr-10 sm:text-sm border-gray-300 rounded-md">
                                 <!-- Submit button inside the search input container -->
                                 <button type="submit" class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                     <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -105,7 +105,7 @@
                         </div>
                         <div class="flex items-center space-x-3">
                             <div>
-                                <select id="role-filter" name="role" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#0284c7] focus:border-[#0284c7] sm:text-sm rounded-md">
+                                <select id="role-filter" name="role" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-600 sm:text-sm rounded-md">
                                     <option value="">All Roles</option>
                                     <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                                     <option value="supervisor" {{ request('role') === 'supervisor' ? 'selected' : '' }}>Supervisor</option>
@@ -113,7 +113,7 @@
                                 </select>
                             </div>
                             <div>
-                                <select id="sort-by" name="sort" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#0284c7] focus:border-[#0284c7] sm:text-sm rounded-md">
+                                <select id="sort-by" name="sort" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-600 sm:text-sm rounded-md">
                                     <option value="name" {{ request('sort') === 'name' ? 'selected' : '' }}>Sort by Name</option>
                                     <option value="role" {{ request('sort') === 'role' ? 'selected' : '' }}>Sort by Role</option>
                                     <option value="created" {{ request('sort') === 'created' ? 'selected' : '' }}>Sort by Created Date</option>
@@ -152,7 +152,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
-                                            <div class="h-10 w-10 rounded-full bg-[#0284c7] flex items-center justify-center text-white font-bold">
+                                            <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
                                                 {{ strtoupper(substr($user->first_name, 0, 1) . substr($user->last_name, 0, 1)) }}
                                             </div>
                                         </div>
@@ -173,7 +173,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @php
                                         $roleColors = [
-                                            'admin' => 'bg-purple-100 text-purple-800',
+                                            'admin' => 'bg-purple-100 text-indigo-800',
                                             'supervisor' => 'bg-blue-100 text-blue-800',
                                             'staff' => 'bg-green-100 text-green-800'
                                         ];

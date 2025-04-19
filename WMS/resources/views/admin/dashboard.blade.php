@@ -139,7 +139,6 @@
                     </button>
                     
                     <!-- Tasks Container (Hidden by default unless filtered) -->
-                    
                     <div class="tasks-container {{ ($status === 'all') || ($status !== 'all' && count($project->tasks) > 0) ? '' : 'hidden' }} border-t">
                         <div class="p-4 space-y-3">
                             @if(count($project->tasks) > 0)
@@ -192,9 +191,8 @@
                                                 </div>
                                                 
                                                 <span class="px-2 py-1 text-xs rounded-full {{ $statusColor }} whitespace-nowrap">
-    {{ $displayStatus }}
-</span>
-
+                                                    {{ $displayStatus }}
+                                                </span>
                                             </div>
                                             
                                             @if($task->Comment)
@@ -272,14 +270,11 @@
                                                                             <div>Assigned to: {{ $subtask->assigned_staff }}</div>
                                                                             <div>Due: <span class="{{ $isSubtaskOverdue ? 'text-red-600' : '' }}">
                                                                                 {{ \Carbon\Carbon::parse($subtask->due_date)->format('M d, Y') }}
-                                                                                @if($isSubtaskOverdue)
-                                                                                    <span class="text-red-500">(Overdue)</span>
-                                                                                @endif
                                                                             </span></div>
                                                                         </div>
                                                                     </div>
                                                                     
-                                                                    <span class="px-2 py-1 text-xs rounded-full {{ $subtaskStatusColor }}">
+                                                                    <span class="px-2 py-1 text-xs rounded-full {{ $subtaskStatusColor }} whitespace-nowrap">
                                                                         {{ $displaySubtaskStatus }}
                                                                     </span>
                                                                 </div>

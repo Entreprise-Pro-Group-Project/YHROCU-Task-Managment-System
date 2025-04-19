@@ -13,15 +13,18 @@
     <div class="flex flex-col md:flex-row items-center gap-4 mb-6">
         <!-- Filter Dropdown -->
         <div class="relative inline-block">
-            <button
-                id="filterButton"
-                class="bg-blue-400 text-black text-sm px-4 py-2 rounded hover:bg-blue-500 flex items-center space-x-1"
-            >
-                <span>Filter by Status</span>
-                <svg class="h-4 w-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
+        <button
+            id="filterButton"
+            class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 font-medium"
+          >
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            <span>Filter Tasks</span>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
 
             <!-- Dropdown Menu -->
             <div
@@ -139,12 +142,13 @@
                     </button>
                     
                     <!-- Tasks Container (Hidden by default unless filtered) -->
-                    
-<div class="tasks-container {{ ($status === 'all') || ($status !== 'all' && count($project->tasks) > 0) ? '' : 'hidden' }} border-t">
-
+                    <div class="tasks-container {{ ($status === 'all') || ($status !== 'all' && count($project->tasks) > 0) ? '' : 'hidden' }} border-t">
                         <div class="p-4 space-y-3">
                             @if(count($project->tasks) > 0)
                                 @foreach($project->tasks as $task)
+                                    @if($task->parent_id)
+                                        @continue
+                                    @endif
                                     @php
                                         // Check if task is overdue
                                         $isOverdue = \Carbon\Carbon::parse($task->due_date) < \Carbon\Carbon::now() && strtolower($task->status) !== 'completed';
@@ -190,9 +194,8 @@
                                                 </div>
                                                 
                                                 <span class="px-2 py-1 text-xs rounded-full {{ $statusColor }} whitespace-nowrap">
-    {{ $displayStatus }}
-</span>
-
+                                                    {{ $displayStatus }}
+                                                </span>
                                             </div>
                                             
                                             @if($task->Comment)
@@ -261,11 +264,13 @@
                                                                         <div class="font-medium">{{ $subtask->task_name }}</div>
                                                                         <div class="text-gray-600">
                                                                             <div>Assigned to: {{ $subtask->assigned_staff }}</div>
-                                                                            <div>Due: {{ \Carbon\Carbon::parse($subtask->due_date)->format('M d, Y') }}</div>
+                                                                            <div>Due: <span class="{{ $isSubtaskOverdue ? 'text-red-600' : '' }}">
+                                                                                {{ \Carbon\Carbon::parse($subtask->due_date)->format('M d, Y') }}
+                                                                            </span></div>
                                                                         </div>
                                                                     </div>
                                                                     
-                                                                    <span class="px-2 py-1 text-xs rounded-full {{ $subtaskStatusColor }}">
+                                                                    <span class="px-2 py-1 text-xs rounded-full {{ $subtaskStatusColor }} whitespace-nowrap">
                                                                         {{ $displaySubtaskStatus }}
                                                                     </span>
                                                                 </div>

@@ -34,14 +34,14 @@
         <div class="flex items-center justify-between">
             <!-- Go Back Button -->
             <div class="flex items-center gap-4">
-                <x-primary-button class="bg-blue-500 hover:bg-[#e6c300] text-gray-800">
+                <x-primary-button>
                     {{ __('Back') }}
                 </x-primary-button>
             </div>
             
             <!-- Save Button and Status Message -->
             <div class="flex items-center gap-4">
-                <x-primary-button class="bg-[#FFD100] hover:bg-[#e6c300] text-gray-800">
+                <x-primary-button>
                     {{ __('Save') }}
                 </x-primary-button>
 

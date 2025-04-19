@@ -1,17 +1,12 @@
-    @extends('layouts.app')
+@extends('layouts.app')
 
-    @section('content')
+@section('content')
     <div class="container mx-auto p-6">
         <div class="max-w-6xl mx-auto">
-            <!-- Activity Log Section -->
-            <div class="mb-10">
-                @livewire('activity-log-table', ['projectId' => $project->id])
-            </div>
-            
             <!-- Project Details Card -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                 <!-- Header with gradient background -->
-                <div class="bg-gradient-to-r from-indigo-600 to-blue-500 px-8 py-6">
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 px-8 py-6">
                     <div class="flex items-center justify-between">
                         <h2 class="text-2xl font-bold text-white flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -19,7 +14,7 @@
                             </svg>
                             Project Details
                         </h2>
-                        <a href="/admin/dashboard" class="inline-flex items-center px-4 py-2 bg-white text-indigo-700 rounded-md font-medium text-sm hover:bg-gray-50 transition-colors duration-150 shadow-sm">
+                        <a href="/admin/dashboard" class="inline-flex items-center px-4 py-2 bg-white text-blue-700 rounded-md font-medium text-sm hover:bg-gray-50 transition-colors duration-150 shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
@@ -27,6 +22,11 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- Activity Log Section -->
+                <div class="mb-10">
+                    @livewire('activity-log-table', ['projectId' => $project->id])
+                
                 
                 <!-- Project Information -->
                 <div class="p-8">
@@ -46,7 +46,7 @@
                         <!-- Supervisor -->
                         <div class="bg-gray-50 rounded-lg p-5">
                             <div class="flex items-center mb-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                                 <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Supervisor</h4>
@@ -57,7 +57,7 @@
                         <!-- Timeline -->
                         <div class="bg-gray-50 rounded-lg p-5">
                             <div class="flex items-center mb-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Timeline</h4>
@@ -83,36 +83,21 @@
                     <!-- Project Description -->
                     <div class="bg-gray-50 rounded-lg p-5 mb-6">
                         <div class="flex items-center mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
                             </svg>
                             <h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Description</h4>
                         </div>
                         <p class="text-gray-700 leading-relaxed">{{ $project->project_description }}</p>
                     </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="flex justify-end space-x-4">
-                        <a href="{{ route('projects.edit', $project->id) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md font-medium text-sm hover:bg-indigo-700 transition-colors duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Edit Project
-                        </a>
-                        <a href="/admin/dashboard" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md font-medium text-sm hover:bg-gray-300 transition-colors duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                            </svg>
-                            View All Projects
-                        </a>
-                    </div>
+                </div>
                 </div>
             </div>
             
             <!-- Progress Card -->
             <div class="mt-8 bg-white rounded-xl shadow-lg p-8">
                 <div class="flex items-center mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                     <h3 class="text-xl font-bold text-gray-800">Project Progress</h3>
@@ -138,29 +123,28 @@
                         <p class="text-2xl font-bold text-blue-600">{{ $project->tasks->where('status', 'in_progress')->count() }}</p>
                     </div>
                     <div class="bg-gray-50 rounded-lg p-4">
-    @php
-        $days = (int) \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($project->due_date), false);
-    @endphp
+                        @php
+                            $days = (int) \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($project->due_date), false);
+                        @endphp
 
-    <p class="text-sm text-gray-500 mb-1">
-        @if($days < 0)
-            Days Overdue
-        @else
-            Days Left
-        @endif
-    </p>
+                        <p class="text-sm text-gray-500 mb-1">
+                            @if($days < 0)
+                                Days Overdue
+                            @else
+                                Days Left
+                            @endif
+                        </p>
 
-    <p class="text-2xl font-bold text-indigo-600">
-        @if($days < 0)
-            {{ abs($days) }}
-        @else
-            {{ $days }}
-        @endif
-    </p>
-</div>
-
+                        <p class="text-2xl font-bold text-indigo-600">
+                            @if($days < 0)
+                                {{ abs($days) }}
+                            @else
+                                {{ $days }}
+                            @endif
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    @endsection
+@endsection

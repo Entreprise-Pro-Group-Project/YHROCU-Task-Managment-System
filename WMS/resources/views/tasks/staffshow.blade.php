@@ -3,26 +3,33 @@
 <div class="bg-gray-50 min-h-screen">
     <!-- Blue Gradient Header -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-                <div class="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-bold">Staff Task Management</h2>
-                        <span class="px-3 py-1 bg-white/20 rounded-full text-sm backdrop-blur-sm">Task #{{ $task->id }}</span>
-                    </div>
-                </div>
-
-                <div class="p-4 border-b flex flex-wrap items-center gap-4">
-                    <a href="{{ route('staff.dashboard') }}" class="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors">
-                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                        </svg>
-                        Dashboard
-                    </a>
-                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        <div class="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold">Staff Task Management</h2>
+                <span class="px-3 py-1 bg-white/20 rounded-full text-sm backdrop-blur-sm">Task #{{ $task->id }}</span>
+                        
+                <a href="/staff/dashboard" class="inline-flex items-center px-4 py-2 bg-white text-blue-700 rounded-md font-medium text-sm hover:bg-gray-50 transition-colors duration-150 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    <span class="text-sm text-gray-800 font-medium">Task Details</span>
-                </div>
+                    Back to Dashboard
+                </a>
             </div>
+        </div>
+
+        <div class="p-4 border-b flex flex-wrap items-center gap-4">
+            <a href="{{ route('staff.dashboard') }}" class="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Dashboard
+            </a>
+            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+            <span class="text-sm text-gray-800 font-medium">Task Details</span>
+        </div>
+    </div>
 
     <div class="container mx-auto px-4 max-w-5xl py-8">
         <!-- Task Header -->
@@ -280,18 +287,6 @@
                     </form>
                 </div>
             </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-between">
-            <a href="/staff/dashboard" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
-                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to Dashboard
-            </a>
-            
-            
         </div>
     </div>
 </div>

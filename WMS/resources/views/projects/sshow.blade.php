@@ -2,12 +2,7 @@
 
 @section('content')
     <div class="container mx-auto p-6">
-        <div class="max-w-6xl mx-auto">
-            <!-- Activity Log Section -->
-            <div class="mb-10">
-                @livewire('activity-log-table', ['projectId' => $project->id])
-            </div>
-            
+        <div class="max-w-6xl mx-auto"> 
             <!-- Project Details Card -->
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                 <!-- Header with gradient background -->
@@ -27,6 +22,10 @@
                         </a>
                     </div>
                 </div>
+
+                 <!-- Activity Log Section -->
+                <div class="mb-10">
+                    @livewire('activity-log-table', ['projectId' => $project->id])
                 
                 <!-- Project Information -->
                 <div class="p-8">
@@ -90,6 +89,7 @@
                         </div>
                         <p class="text-gray-700 leading-relaxed">{{ $project->project_description }}</p>
                     </div>
+                </div>
                 </div>
             </div>
             

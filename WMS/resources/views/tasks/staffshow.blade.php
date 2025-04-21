@@ -1,16 +1,30 @@
 @extends('layouts.app-no-sidebar')
 @section('content')
-<div class="bg-gray-50 min-h-screen py-8">
-    <div class="container mx-auto px-4 max-w-5xl">
-        <!-- Breadcrumb Navigation -->
-        <div class="flex items-center text-sm text-gray-500 mb-6">
-            <a href="/staff/dashboard" class="hover:text-blue-600 transition-colors">Dashboard</a>
-            <svg class="h-4 w-4 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-            </svg>
-            <span class="font-medium text-gray-700">Task Details</span>
-        </div>
+<div class="bg-gray-50 min-h-screen">
+    <!-- Blue Gradient Header -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+                <div class="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold">Staff Task Management</h2>
+                        <span class="px-3 py-1 bg-white/20 rounded-full text-sm backdrop-blur-sm">Task #{{ $task->id }}</span>
+                    </div>
+                </div>
 
+                <div class="p-4 border-b flex flex-wrap items-center gap-4">
+                    <a href="{{ route('staff.dashboard') }}" class="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                        <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
+                    </a>
+                    <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span class="text-sm text-gray-800 font-medium">Task Details</span>
+                </div>
+            </div>
+
+    <div class="container mx-auto px-4 max-w-5xl py-8">
         <!-- Task Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <h1 class="text-3xl font-bold text-gray-800">{{ $task->task_name }}</h1>
@@ -337,4 +351,4 @@
         });
     });
 </script>
-@endsection
+@endsection 

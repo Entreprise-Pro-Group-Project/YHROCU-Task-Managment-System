@@ -119,7 +119,7 @@
                     </div>
                     <div class="bg-gray-50 rounded-lg p-4">
                         <p class="text-sm text-gray-500 mb-1">In Progress</p>
-                        <p class="text-2xl font-bold text-blue-600">{{ $project->tasks->where('status', 'in_progress')->count() }}</p>
+                        <p class="text-2xl font-bold text-blue-600">{{ $project->tasks->where('status', 'in progress')->count() }}</p>
                     </div>
                     <div class="bg-gray-50 rounded-lg p-4">
                         @php

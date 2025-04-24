@@ -7,7 +7,7 @@ A custom-built workflow management system designed for the Yorkshire and Humber 
 
 ## 🔧 Tech Stack
 
-- **Frontend:** React.js, Tailwind CSS
+- **Frontend:** React.js, Tailwind CSS, Blade
 - **Backend:** PHP (Laravel Framework)
 - **Database:** MySQL
 - **Auth:** Laravel Breeze (with some Livewire integration)
